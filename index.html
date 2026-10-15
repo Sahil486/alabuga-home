@@ -141,6 +141,64 @@
 @media screen and (max-width:800px){.brand-art{width:174px}}
 @media(prefers-reduced-motion:reduce){.brand-halo,.brand-symbol-shell,.brand-satellite{transition:none!important}}
 @media print{.brand-art{width:174px}.brand-orbit,.brand-orbit-track,.brand-halo{display:none}.brand-symbol-shell{transform:none!important;filter:none!important}}
+
+/* Interactive growth sculpture and light on the existing blue cards. */
+@media screen{
+ .hero-facts{max-width:550px;min-height:112px;gap:16px;align-items:center}
+ .hero-facts>span{flex:none;white-space:nowrap}
+ .growth-scene{position:relative;flex:1 1 240px;min-width:138px;max-width:260px;height:112px;margin-left:auto;padding:0 0 18px;border:0;border-radius:18px;background:transparent;color:var(--blue);font:inherit;cursor:pointer;touch-action:manipulation}
+ .growth-art{display:block;width:100%;height:100%;overflow:visible;pointer-events:none}
+ .growth-scene-caption{position:absolute;inset:auto 0 0;text-align:center;color:#657493;font-size:9px;font-weight:650;line-height:1.5;letter-spacing:.025em;transition:color .3s ease}
+ .growth-scene-caption>span{display:inline-block;margin-left:3px;color:var(--blue);transition:transform .4s ease}
+ .growth-scene:is(:hover,:focus-visible) .growth-scene-caption{color:var(--blue)}
+ .growth-scene:is(:hover,:focus-visible) .growth-scene-caption>span{transform:translate(2px,-2px)}
+ .growth-parallax{transform:translate(var(--scene-x,0px),var(--scene-y,0px));transition:transform .4s cubic-bezier(.22,1,.36,1)}
+ .growth-cube{transform:translate(var(--cube-x),var(--cube-y));transition:transform 1.15s cubic-bezier(.22,1,.36,1)}
+ .growth-trail{transition:opacity .7s ease}
+ .growth-scene.is-assembled .growth-trail{opacity:.12}
+.growth-cube-1{--cube-x:50px;--cube-y:77px;--float-delay:0.0s}
+.growth-cube-2{--cube-x:82px;--cube-y:66px;--float-delay:-0.8s}
+.growth-cube-3{--cube-x:114px;--cube-y:55px;--float-delay:-1.6s}
+.growth-cube-4{--cube-x:146px;--cube-y:44px;--float-delay:-2.4000000000000004s}
+.growth-cube-5{--cube-x:178px;--cube-y:33px;--float-delay:-3.2s}
+.growth-cube-6{--cube-x:210px;--cube-y:22px;--float-delay:-4.0s}
+.growth-scene.is-assembled .growth-cube-1{--cube-x:140px;--cube-y:20px}
+.growth-scene.is-assembled .growth-cube-2{--cube-x:123px;--cube-y:29px}
+.growth-scene.is-assembled .growth-cube-3{--cube-x:106px;--cube-y:38px}
+.growth-scene.is-assembled .growth-cube-4{--cube-x:157px;--cube-y:29px}
+.growth-scene.is-assembled .growth-cube-5{--cube-x:174px;--cube-y:38px}
+.growth-scene.is-assembled .growth-cube-6{--cube-x:140px;--cube-y:72px}
+ .hero-cards [data-card-motion]{isolation:isolate;transition:transform .3s ease,box-shadow .35s ease,background .2s ease}
+ .hero-cards [data-card-motion]>:not(.brand-pattern){position:relative;z-index:2}
+ .hero-cards [data-card-motion] .brand-pattern{z-index:0}
+ .hero-cards [data-card-motion]::before,.hero-cards [data-card-motion]::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .35s ease}
+ .hero-cards [data-card-motion]::before{z-index:1;background:radial-gradient(250px circle at var(--card-light-x,50%) var(--card-light-y,45%),#ffffff2a,transparent 65%)}
+ .hero-cards [data-card-motion]::after{z-index:3;border:1px solid #ffffff55}
+ .hero-cards [data-card-motion]:is(.is-pointed,:focus-within)::before,.hero-cards [data-card-motion]:is(.is-pointed,:focus-within)::after{opacity:1}
+ .hero-cards [data-card-motion]:is(.is-pointed,:focus-within){box-shadow:0 18px 36px -18px #1245cf70,0 6px 18px -12px #1245cf50}
+}
+@keyframes growth-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes hero-diamond-drift{0%,100%{transform:translateY(0) rotate(45deg)}50%{transform:translateY(-5px) rotate(48deg)}}
+@media screen and (prefers-reduced-motion:no-preference){
+ .growth-float{animation:growth-float 7.5s ease-in-out infinite;animation-delay:var(--float-delay,0s)}
+ .hero-cards .brand-pattern i{animation:hero-diamond-drift 12s ease-in-out infinite}
+ .hero-cards .brand-pattern i:nth-child(2){animation-delay:-4s}
+ .hero-cards .brand-pattern i:nth-child(3){animation-delay:-8s}
+ .hero-motion-paused .growth-float,.hero-motion-paused .brand-pattern i{animation-play-state:paused}
+}
+@media screen and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+ .hero-cards [data-card-motion]{transform:perspective(900px) rotateX(var(--card-rx,0deg)) rotateY(var(--card-ry,0deg)) translateY(var(--card-lift,0px))}
+ .hero-cards [data-card-motion].is-pointed{--card-lift:-3px}
+}
+@media screen and (max-width:560px){
+ .hero-facts{min-height:100px;gap:8px}
+ .growth-scene{height:100px;max-width:190px;min-width:138px}
+ .growth-scene-caption{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+ .growth-cube,.growth-parallax,.growth-trail,.growth-scene-caption,.growth-scene-caption>span,.hero-cards [data-card-motion],.hero-cards [data-card-motion]::before,.hero-cards [data-card-motion]::after{transition:none!important}
+}
+@media print{.growth-scene{display:none!important}}
 </style>
   </head>
 <body id="top">
@@ -180,17 +238,23 @@
         <p class="eyebrow"><span></span> Памятка для проживающих</p>
         <h1 id="page-title">Правила проживания<br><span>в корпоративном хостеле</span></h1>
         <p class="hero-description">Всё, что нужно знать о порядке, безопасности<br class="desktop-break"> и уважении к соседям.</p>
-        <div class="hero-facts"><span><b>27</b> правил</span></div>
+        <div class="hero-facts"><span><b>27</b> правил</span><button class="growth-scene" id="growth-scene" type="button" aria-label="Собрать блоки в знак Алабуги" aria-pressed="false" title="Нажмите, чтобы собрать знак Алабуги"><svg class="growth-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 112" width="280" height="112" aria-hidden="true" focusable="false">
+ <defs><radialGradient id="growth-ground"><stop stop-color="#96bfff" stop-opacity=".4"/><stop offset="1" stop-color="#dceaff" stop-opacity="0"/></radialGradient></defs>
+ <ellipse cx="140" cy="96" rx="119" ry="15" fill="url(#growth-ground)"/>
+ <path class="growth-trail" d="M25 93C93 107 175 74 247 35" fill="none" stroke="#9dbef3" stroke-width="1" stroke-dasharray="3 6" opacity=".5"/>
+ <path class="growth-trail" d="m241 32 7 2-2 7" fill="none" stroke="#8eafe8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/>
+ <g class="growth-parallax"><g class="growth-cube growth-cube-1" transform="translate(50 77)"><g class="growth-float"><path fill="#2868dc" d="M0-16 17-7 0 2-17-7Z"/><path fill="#1446b5" d="M-17-7 0 2 0 22-17 13Z"/><path fill="#082d91" d="M0 2 17-7 17 13 0 22Z"/><path d="M-17-7 0 2 17-7M0 2V22" fill="none" stroke="#fff" stroke-width=".6" stroke-opacity=".22"/></g></g><g class="growth-cube growth-cube-2" transform="translate(82 66)"><g class="growth-float"><path fill="#65b4ff" d="M0-16 17-7 0 2-17-7Z"/><path fill="#2581ec" d="M-17-7 0 2 0 22-17 13Z"/><path fill="#1253c1" d="M0 2 17-7 17 13 0 22Z"/><path d="M-17-7 0 2 17-7M0 2V22" fill="none" stroke="#fff" stroke-width=".6" stroke-opacity=".22"/></g></g><g class="growth-cube growth-cube-3" transform="translate(114 55)"><g class="growth-float"><path fill="#7fc9ff" d="M0-16 17-7 0 2-17-7Z"/><path fill="#3ba1ef" d="M-17-7 0 2 0 22-17 13Z"/><path fill="#1e80dc" d="M0 2 17-7 17 13 0 22Z"/><path d="M-17-7 0 2 17-7M0 2V22" fill="none" stroke="#fff" stroke-width=".6" stroke-opacity=".22"/></g></g><g class="growth-cube growth-cube-4" transform="translate(146 44)"><g class="growth-float"><path fill="#65b4ff" d="M0-16 17-7 0 2-17-7Z"/><path fill="#2581ec" d="M-17-7 0 2 0 22-17 13Z"/><path fill="#1253c1" d="M0 2 17-7 17 13 0 22Z"/><path d="M-17-7 0 2 17-7M0 2V22" fill="none" stroke="#fff" stroke-width=".6" stroke-opacity=".22"/></g></g><g class="growth-cube growth-cube-5" transform="translate(178 33)"><g class="growth-float"><path fill="#7fc9ff" d="M0-16 17-7 0 2-17-7Z"/><path fill="#3ba1ef" d="M-17-7 0 2 0 22-17 13Z"/><path fill="#1e80dc" d="M0 2 17-7 17 13 0 22Z"/><path d="M-17-7 0 2 17-7M0 2V22" fill="none" stroke="#fff" stroke-width=".6" stroke-opacity=".22"/></g></g><g class="growth-cube growth-cube-6" transform="translate(210 22)"><g class="growth-float"><path fill="#c1ebff" d="M0-16 17-7 0 2-17-7Z"/><path fill="#82c8f5" d="M-17-7 0 2 0 22-17 13Z"/><path fill="#56afe8" d="M0 2 17-7 17 13 0 22Z"/><path d="M-17-7 0 2 17-7M0 2V22" fill="none" stroke="#fff" stroke-width=".6" stroke-opacity=".22"/></g></g></g>
+</svg><span class="growth-scene-caption">Собрать знак <span aria-hidden="true">↗</span></span></button></div>
       </div>
       <div class="hero-cards">
-      <aside class="curfew" aria-label="Напоминание о комендантском часе">
+      <aside class="curfew" data-card-motion aria-label="Напоминание о комендантском часе">
         <div class="curfew-top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg><span>Комендантский час</span></div>
         <p class="curfew-time"><img class="curfew-clock" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNjM1LjcwNzQ5MCA3MjUuNjAzOTQ1IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IjIzOjAwIj48dGl0bGU+MjM6MDA8L3RpdGxlPjxnIGZpbGw9IiNmZmYiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDIuMDM1MzM1IDcxMi44MDE5NzMpIHNjYWxlKDEgLTEpIj48cGF0aCBkPSJNMzEuNjU0ODg4MzU4OTg1NDc0IDBWMTE0LjM5MDMwOTk5MzQ5NjYzTDI5Ny45MDM4NTg2NjAzMDc4MyAzNjQuMzgwNDQ2NTY0MDU4MVEzMjcuMzg2MTkxMTk4Nzg2MDQgMzkyLjQwNTkxODA1NzY2MzE0IDM0MS44NTU3ODc5OTA0NjE3NSA0MTMuNzQ2MDk3OTgzOTU4NFEzNTYuMzI1Mzg0NzgyMTM3NDYgNDM1LjA4NjI3NzkxMDI1MzYgMzYxLjIzOTEwNjg3MTg4MzggNDUyLjY5ODAyNzMxNDExMjNRMzY2LjE1MjgyODk2MTYzMDIgNDcwLjMwOTc3NjcxNzk3MSAzNjYuMTUyODI4OTYxNjMwMiA0ODUuOTY0NjY1MDc2OTU2NFEzNjYuMTUyODI4OTYxNjMwMiA1MjMuMzg2MTkxMTk4Nzg2IDM0MC43MDA4OTk2MzE0NzYyNiA1NDQuMjgyMjQ1ODI3MDEwN1EzMTUuMjQ4OTcwMzAxMzIyMzQgNTY1LjE3ODMwMDQ1NTIzNTIgMjY1LjI1ODgzMzczMDc2MDkgNTY1LjE3ODMwMDQ1NTIzNTJRMjIzLjc1MTAyOTY5ODY3NzY2IDU2NS4xNzgzMDA0NTUyMzUyIDE4OC42Njk2ODM1MDMxNDMzIDU0Ny45OTMwMDg4ODc5MjU1UTE1My41ODgzMzczMDc2MDg5MiA1MzAuODA3NzE3MzIwNjE1NyAxMzAuMjc4NTYwNTg5NjM3OTggNDk2LjA2NjU1MTA1MTM3NjU2TC0yLjAzNTMzNDkyMzA0MzU3MSA1NzUuMDE1NjA4MDY0MTY2NVEzNy4zMzUyNDgyMTE1NzU5OCA2MzcuODc4Mzg3MTY2NzAyOSAxMTAuMTM3MjIwODk3NDYzNjkgNjc1LjM0MDE3OTkyNjI5NTNRMTgyLjkzOTE5MzU4MzM1MTQgNzEyLjgwMTk3MjY4NTg4NzcgMjgxLjc3NjUwMTE5MjI4MjcgNzEyLjgwMTk3MjY4NTg4NzdRMzYxLjEyMTYxMjgzMzI5NzIgNzEyLjgwMTk3MjY4NTg4NzcgNDIxLjAwOTg2MzQyOTQzODU1IDY4Ny4xNzI1NTU4MjA1MDcyUTQ4MC44OTgxMTQwMjU1Nzk5IDY2MS41NDMxMzg5NTUxMjY4IDUxNC4xNTY5NDc3NTYzNDA3IDYxNC41OTkwMTM2NTcwNTZRNTQ3LjQxNTc4MTQ4NzEwMTYgNTY3LjY1NDg4ODM1ODk4NTQgNTQ3LjQxNTc4MTQ4NzEwMTYgNTAzLjM5NjA1NDYyODIyNDZRNTQ3LjQxNTc4MTQ4NzEwMTYgNDY5LjM5NjA1NDYyODIyNDYgNTM4LjY4NzM1MDk2NDY2NSA0MzUuNjI0NDg1MTUwNjYxMTRRNTI5Ljk1ODkyMDQ0MjIyODQgNDAxLjg1MjkxNTY3MzA5Nzc1IDUwNC40MTU3ODE0ODcxMDE2NCAzNjQuNTgxMzQ2MTk1NTM0MzdRNDc4Ljg3MjY0MjUzMTk3NDg2IDMyNy4zMDk3NzY3MTc5NzEgNDI5LjI0MzIyNTY2NjU5NDQgMjgxLjMwOTc3NjcxNzk3MUwyMTMuNjU5MDA3MTUzNjk2MDggNzkuOTg0MzkxOTM1ODMzNTFMMTgxLjY4NDQ3ODY0NzMwMTEyIDE0NC42MjM2NzIyMzA2NTI1Mkg1NjguODk4MTE0MDI1NTc5OFYwWiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAgMCkiLz48cGF0aCBkPSJNMjY2LjgwMTk3MjY4NTg4NzczIC0xMi44MDE5NzI2ODU4ODc3MDlRMTkzLjg4ODI1MDU5NjE0MTM1IC0xMi44MDE5NzI2ODU4ODc3MDkgMTIxLjcxNTY5NDc3NTYzNDA4IDUuOTM5MTkzNTgzMzUxMzk5UTQ5LjU0MzEzODk1NTEyNjgxNCAyNC42ODAzNTk4NTI1OTA1MDYgLTIuMzQ1MTExNjQxMDE0NTI2IDU5LjMzNTI0ODIxMTU3NTk4TDY0Ljg2Mjc3OTEwMjUzNjMxIDE5NS40MTU3ODE0ODcxMDE2N1ExMDYuMjA3ODkwNzQzNTUwODMgMTY2LjY3NDYxNTIxNzg2MjU3IDE1OC4yMjA2MjY0OTAzNTMzNCAxNTAuNzQ4MTU3MzgxMzEzNjZRMjEwLjIzMzM2MjIzNzE1NTg2IDEzNC44MjE2OTk1NDQ3NjQ3OCAyNjIgMTM0LjgyMTY5OTU0NDc2NDc4UTMxNy41MzMyNzU1MjU2ODgzIDEzNC44MjE2OTk1NDQ3NjQ3OCAzNTAuMzQzMDUyMjQzNjU5MjYgMTU2LjMxNjc2NzgzMDA0NTUzUTM4My4xNTI4Mjg5NjE2MzAyIDE3Ny44MTE4MzYxMTUzMjYyNiAzODMuMTUyODI4OTYxNjMwMiAyMTYuMjMzMzYyMjM3MTU1ODZRMzgzLjE1MjgyODk2MTYzMDIgMjUyLjAyNTQ3MTQ5MzYwNTA0IDM1NS4wMTU2MDgwNjQxNjY1IDI3Mi43NDg5NzAzMDEzMjIzNFEzMjYuODc4Mzg3MTY2NzAyOCAyOTMuNDcyNDY5MTA5MDM5NjUgMjYzLjYwMzk0NTM3MTc3NTQgMjkzLjQ3MjQ2OTEwOTAzOTY1SDE4NS42ODAzNTk4NTI1OTA1VjQwOS4yMzMzNjIyMzcxNTU4NkwzNzYuNzMxMzAyODM5ODAwNTUgNjIxLjU1ODc0NzAxOTI5MzNMMzk1LjkwMzg1ODY2MDMwNzgzIDU1OC4wOTIwMjI1NDQ5ODE1SDMyLjc0MTE2NjI2OTIzOTExVjcwMEg1MzAuOTg0MzkxOTM1ODMzNVY1ODUuNjA5NjkwMDA2NTAzM0wzMzkuOTMzNDQ4OTQ4NjIzNDQgMzczLjI4NDMwNTIyNDM2NTk0TDI1MC42OTAyMjMyODIwMjkwNSA0MjQuNDkyMTk1OTY3OTE2NzZIMzAwLjgxMTgzNjExNTMyNjIzUTQzMC45ODQzOTE5MzU4MzM1IDQyNC40OTIxOTU5Njc5MTY3NiA0OTcuNzAwMDg2NzExNDY3NiAzNjYuMTc3NDg3NTM1MjI2NTNRNTY0LjQxNTc4MTQ4NzEwMTYgMzA3Ljg2Mjc3OTEwMjUzNjMgNTY0LjQxNTc4MTQ4NzEwMTYgMjE2LjY5MDIyMzI4MjAyOTA1UTU2NC40MTU3ODE0ODcxMDE2IDE1Ny4xNDcwODQzMjY5MDIyNSA1MzIuNzQzMjI1NjY2NTk0NCAxMDQuNjU5ODIwMDczNzA0NzVRNTAxLjA3MDY2OTg0NjA4NzEgNTIuMTcyNTU1ODIwNTA3MjYgNDM1LjM2NzcxMDgxNzI1NTU2IDE5LjY4NTI5MTU2NzMwOTc3NVEzNjkuNjY0NzUxNzg4NDI0MDQgLTEyLjgwMTk3MjY4NTg4NzcwOSAyNjYuODAxOTcyNjg1ODg3NzMgLTEyLjgwMTk3MjY4NTg4NzcwOVoiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDU5NC4wMDAwMDAgMCkiLz48cGF0aCBkPSJNMzQwLjk3NDUyODUwNjM5NDk2IC0xMi44MDE5NzI2ODU4ODc3MDlRMjUzIC0xMi44MDE5NzI2ODU4ODc3MDkgMTg0LjI0MTE2NjI2OTIzOTEgMjkuNzQxMTY2MjY5MjM5MTFRMTE1LjQ4MjMzMjUzODQ3ODIyIDcyLjI4NDMwNTIyNDM2NTkyIDc2LjEyNDQ4NTE1MDY2MTE3IDE1My4zNzA1ODMxMzQ2MTk1NVEzNi43NjY2Mzc3NjI4NDQxNCAyMzQuNDU2ODYxMDQ0ODczMiAzNi43NjY2Mzc3NjI4NDQxNCAzNTBRMzYuNzY2NjM3NzYyODQ0MTQgNDY1LjU0MzEzODk1NTEyNjg0IDc2LjEyNDQ4NTE1MDY2MTE3IDU0Ni42Mjk0MTY4NjUzODA0UTExNS40ODIzMzI1Mzg0NzgyMiA2MjcuNzE1Njk0Nzc1NjM0MSAxODQuMjQxMTY2MjY5MjM5MSA2NzAuMjU4ODMzNzMwNzYwOVEyNTMgNzEyLjgwMTk3MjY4NTg4NzcgMzQwLjk3NDUyODUwNjM5NDk2IDcxMi44MDE5NzI2ODU4ODc3UTQyOC45NDkwNTcwMTI3ODk5IDcxMi44MDE5NzI2ODU4ODc3IDQ5Ny43MDc4OTA3NDM1NTA4IDY3MC4yNTg4MzM3MzA3NjA5UTU2Ni40NjY3MjQ0NzQzMTE3IDYyNy43MTU2OTQ3NzU2MzQxIDYwNS44MjQ1NzE4NjIxMjg4IDU0Ni42Mjk0MTY4NjUzODA0UTY0NS4xODI0MTkyNDk5NDU4IDQ2NS41NDMxMzg5NTUxMjY4NCA2NDUuMTgyNDE5MjQ5OTQ1OCAzNTBRNjQ1LjE4MjQxOTI0OTk0NTggMjM0LjQ1Njg2MTA0NDg3MzIgNjA1LjgyNDU3MTg2MjEyODggMTUzLjM3MDU4MzEzNDYxOTU1UTU2Ni40NjY3MjQ0NzQzMTE3IDcyLjI4NDMwNTIyNDM2NTkyIDQ5Ny43MDc4OTA3NDM1NTA4IDI5Ljc0MTE2NjI2OTIzOTExUTQyOC45NDkwNTcwMTI3ODk5IC0xMi44MDE5NzI2ODU4ODc3MDkgMzQwLjk3NDUyODUwNjM5NDk2IC0xMi44MDE5NzI2ODU4ODc3MDlaTTM0MC45NzQ1Mjg1MDYzOTQ5NiAxMzYuNDUxMTE2NDEwMTQ1MjNRMzc3LjIyMzQ5ODgwNzcxNzMgMTM2LjQ1MTExNjQxMDE0NTIzIDQwNC44MTc1ODA3NTAwNTQxNiAxNTcuOTMzNDQ4OTQ4NjIzNDRRNDMyLjQxMTY2MjY5MjM5MTEgMTc5LjQxNTc4MTQ4NzEwMTY3IDQ0OC4xNjU1NjQ3MDg0MzI3IDIyNi42MzkyODAyOTQ4MTlRNDYzLjkxOTQ2NjcyNDQ3NDMgMjczLjg2Mjc3OTEwMjUzNjMgNDYzLjkxOTQ2NjcyNDQ3NDMgMzUwUTQ2My45MTk0NjY3MjQ0NzQzIDQyNi42ODAzNTk4NTI1OTA1IDQ0OC4xNjU1NjQ3MDg0MzI3IDQ3My42MzIyODkxODI3NDQ0NFE0MzIuNDExNjYyNjkyMzkxMSA1MjAuNTg0MjE4NTEyODk4NCA0MDQuODE3NTgwNzUwMDU0MTYgNTQyLjA2NjU1MTA1MTM3NjZRMzc3LjIyMzQ5ODgwNzcxNzMgNTYzLjU0ODg4MzU4OTg1NDggMzQwLjk3NDUyODUwNjM5NDk2IDU2My41NDg4ODM1ODk4NTQ4UTMwNS4xODI0MTkyNDk5NDU4IDU2My41NDg4ODM1ODk4NTQ4IDI3Ny4zNTk5MDY3ODUxNzIzIDU0Mi4wNjY1NTEwNTEzNzY2UTI0OS41MzczOTQzMjAzOTg4NyA1MjAuNTg0MjE4NTEyODk4NCAyMzMuNzgzNDkyMzA0MzU3MjUgNDczLjYzMjI4OTE4Mjc0NDQ0UTIxOC4wMjk1OTAyODgzMTU2MyA0MjYuNjgwMzU5ODUyNTkwNSAyMTguMDI5NTkwMjg4MzE1NjMgMzUwUTIxOC4wMjk1OTAyODgzMTU2MyAyNzMuODYyNzc5MTAyNTM2MyAyMzMuNzgzNDkyMzA0MzU3MjUgMjI2LjYzOTI4MDI5NDgxOVEyNDkuNTM3Mzk0MzIwMzk4ODcgMTc5LjQxNTc4MTQ4NzEwMTY3IDI3Ny4zNTk5MDY3ODUxNzIzIDE1Ny45MzM0NDg5NDg2MjM0NFEzMDUuMTgyNDE5MjQ5OTQ1OCAxMzYuNDUxMTE2NDEwMTQ1MjMgMzQwLjk3NDUyODUwNjM5NDk2IDEzNi40NTExMTY0MTAxNDUyM1oiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEzMDYuNDg5NzM2IDApIi8+PHBhdGggZD0iTTM0MC45NzQ1Mjg1MDYzOTQ5NiAtMTIuODAxOTcyNjg1ODg3NzA5UTI1MyAtMTIuODAxOTcyNjg1ODg3NzA5IDE4NC4yNDExNjYyNjkyMzkxIDI5Ljc0MTE2NjI2OTIzOTExUTExNS40ODIzMzI1Mzg0NzgyMiA3Mi4yODQzMDUyMjQzNjU5MiA3Ni4xMjQ0ODUxNTA2NjExNyAxNTMuMzcwNTgzMTM0NjE5NTVRMzYuNzY2NjM3NzYyODQ0MTQgMjM0LjQ1Njg2MTA0NDg3MzIgMzYuNzY2NjM3NzYyODQ0MTQgMzUwUTM2Ljc2NjYzNzc2Mjg0NDE0IDQ2NS41NDMxMzg5NTUxMjY4NCA3Ni4xMjQ0ODUxNTA2NjExNyA1NDYuNjI5NDE2ODY1MzgwNFExMTUuNDgyMzMyNTM4NDc4MjIgNjI3LjcxNTY5NDc3NTYzNDEgMTg0LjI0MTE2NjI2OTIzOTEgNjcwLjI1ODgzMzczMDc2MDlRMjUzIDcxMi44MDE5NzI2ODU4ODc3IDM0MC45NzQ1Mjg1MDYzOTQ5NiA3MTIuODAxOTcyNjg1ODg3N1E0MjguOTQ5MDU3MDEyNzg5OSA3MTIuODAxOTcyNjg1ODg3NyA0OTcuNzA3ODkwNzQzNTUwOCA2NzAuMjU4ODMzNzMwNzYwOVE1NjYuNDY2NzI0NDc0MzExNyA2MjcuNzE1Njk0Nzc1NjM0MSA2MDUuODI0NTcxODYyMTI4OCA1NDYuNjI5NDE2ODY1MzgwNFE2NDUuMTgyNDE5MjQ5OTQ1OCA0NjUuNTQzMTM4OTU1MTI2ODQgNjQ1LjE4MjQxOTI0OTk0NTggMzUwUTY0NS4xODI0MTkyNDk5NDU4IDIzNC40NTY4NjEwNDQ4NzMyIDYwNS44MjQ1NzE4NjIxMjg4IDE1My4zNzA1ODMxMzQ2MTk1NVE1NjYuNDY2NzI0NDc0MzExNyA3Mi4yODQzMDUyMjQzNjU5MiA0OTcuNzA3ODkwNzQzNTUwOCAyOS43NDExNjYyNjkyMzkxMVE0MjguOTQ5MDU3MDEyNzg5OSAtMTIuODAxOTcyNjg1ODg3NzA5IDM0MC45NzQ1Mjg1MDYzOTQ5NiAtMTIuODAxOTcyNjg1ODg3NzA5Wk0zNDAuOTc0NTI4NTA2Mzk0OTYgMTM2LjQ1MTExNjQxMDE0NTIzUTM3Ny4yMjM0OTg4MDc3MTczIDEzNi40NTExMTY0MTAxNDUyMyA0MDQuODE3NTgwNzUwMDU0MTYgMTU3LjkzMzQ0ODk0ODYyMzQ0UTQzMi40MTE2NjI2OTIzOTExIDE3OS40MTU3ODE0ODcxMDE2NyA0NDguMTY1NTY0NzA4NDMyNyAyMjYuNjM5MjgwMjk0ODE5UTQ2My45MTk0NjY3MjQ0NzQzIDI3My44NjI3NzkxMDI1MzYzIDQ2My45MTk0NjY3MjQ0NzQzIDM1MFE0NjMuOTE5NDY2NzI0NDc0MyA0MjYuNjgwMzU5ODUyNTkwNSA0NDguMTY1NTY0NzA4NDMyNyA0NzMuNjMyMjg5MTgyNzQ0NDRRNDMyLjQxMTY2MjY5MjM5MTEgNTIwLjU4NDIxODUxMjg5ODQgNDA0LjgxNzU4MDc1MDA1NDE2IDU0Mi4wNjY1NTEwNTEzNzY2UTM3Ny4yMjM0OTg4MDc3MTczIDU2My41NDg4ODM1ODk4NTQ4IDM0MC45NzQ1Mjg1MDYzOTQ5NiA1NjMuNTQ4ODgzNTg5ODU0OFEzMDUuMTgyNDE5MjQ5OTQ1OCA1NjMuNTQ4ODgzNTg5ODU0OCAyNzcuMzU5OTA2Nzg1MTcyMyA1NDIuMDY2NTUxMDUxMzc2NlEyNDkuNTM3Mzk0MzIwMzk4ODcgNTIwLjU4NDIxODUxMjg5ODQgMjMzLjc4MzQ5MjMwNDM1NzI1IDQ3My42MzIyODkxODI3NDQ0NFEyMTguMDI5NTkwMjg4MzE1NjMgNDI2LjY4MDM1OTg1MjU5MDUgMjE4LjAyOTU5MDI4ODMxNTYzIDM1MFEyMTguMDI5NTkwMjg4MzE1NjMgMjczLjg2Mjc3OTEwMjUzNjMgMjMzLjc4MzQ5MjMwNDM1NzI1IDIyNi42MzkyODAyOTQ4MTlRMjQ5LjUzNzM5NDMyMDM5ODg3IDE3OS40MTU3ODE0ODcxMDE2NyAyNzcuMzU5OTA2Nzg1MTcyMyAxNTcuOTMzNDQ4OTQ4NjIzNDRRMzA1LjE4MjQxOTI0OTk0NTggMTM2LjQ1MTExNjQxMDE0NTIzIDM0MC45NzQ1Mjg1MDYzOTQ5NiAxMzYuNDUxMTE2NDEwMTQ1MjNaIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxOTg4LjQ4OTczNiAwKSIvPjwvZz48ZyBmaWxsPSIjZmZmIj48Y2lyY2xlIGN4PSIxMjUyLjg3MTQxMiIgY3k9IjIzMi4xOTMyNjMiIHI9IjU0LjQyMDI5NiIvPjxjaXJjbGUgY3g9IjEyNTIuODcxNDEyIiBjeT0iNDkzLjQxMDY4MyIgcj0iNTQuNDIwMjk2Ii8+PC9nPjwvc3ZnPg==" alt="23:00"></p>
         <p>После этого времени не покидайте<br>свою квартиру и не находитесь в гостях.</p>
         <a href="#faq-6">Как спланировать возвращение <span aria-hidden="true">↗</span></a>
         <div class="brand-pattern" aria-hidden="true"><i></i><i></i><i></i></div>
       </aside>
-      <a class="quick-contacts" href="#contacts" aria-label="Открыть контакты: Каллисто, Ганимед, Пирамида">
+      <a class="quick-contacts" data-card-motion href="#contacts" aria-label="Открыть контакты: Каллисто, Ганимед, Пирамида">
         <div class="quick-contacts-top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m8 3 3 5-3 3a16 16 0 0 0 5 5l3-3 5 3v3a2 2 0 0 1-2 2C10 21 3 14 3 5a2 2 0 0 1 2-2z"/></svg><span>Контакты</span></div>
         <p class="quick-contact-names"><span>Каллисто</span><span>Ганимед</span><span>Пирамида</span></p>
         <div class="quick-contacts-bottom"><span>Телефоны и почта</span><span aria-hidden="true">↗</span></div>
@@ -1028,6 +1092,61 @@ window.HOSTEL_DATA = {
   }
   ['pointerenter','pointerleave','focus','blur'].forEach(event=>brand.addEventListener(event,update));
   reduced.addEventListener('change',()=>{cancelAnimationFrame(frame);frame=0;speed=target=1;});
+})();
+</script>
+<script>
+/* Local decorative interactions; all navigation and rule data stay independent. */
+(()=>{
+ const scene=document.getElementById('growth-scene');
+ const hero=document.querySelector('.hero');
+ const cards=[...document.querySelectorAll('[data-card-motion]')];
+ const reduced=window.matchMedia('(prefers-reduced-motion:reduce)');
+ const fine=window.matchMedia('(hover:hover) and (pointer:fine)');
+ if(!scene||!hero)return;
+ let sceneFrame=0,scenePoint={x:0,y:0};
+ function clearScene(){cancelAnimationFrame(sceneFrame);sceneFrame=0;scene.style.removeProperty('--scene-x');scene.style.removeProperty('--scene-y');}
+ scene.addEventListener('pointermove',event=>{
+  if(reduced.matches||!fine.matches||event.pointerType==='touch')return;
+  const rect=scene.getBoundingClientRect();
+  scenePoint={x:Math.max(-1,Math.min(1,(event.clientX-rect.left)/rect.width*2-1))*7,y:Math.max(-1,Math.min(1,(event.clientY-rect.top)/rect.height*2-1))*4};
+  if(!sceneFrame)sceneFrame=requestAnimationFrame(()=>{scene.style.setProperty('--scene-x',scenePoint.x.toFixed(2)+'px');scene.style.setProperty('--scene-y',scenePoint.y.toFixed(2)+'px');sceneFrame=0;});
+ });
+ ['pointerleave','pointercancel'].forEach(event=>scene.addEventListener(event,clearScene));
+ scene.addEventListener('click',()=>{
+  const assembled=scene.classList.toggle('is-assembled');
+  scene.setAttribute('aria-pressed',String(assembled));
+  scene.setAttribute('aria-label',assembled?'Разложить блоки по ступеням роста':'Собрать блоки в знак Алабуги');
+  scene.title=assembled?'Нажмите, чтобы вернуть ступени роста':'Нажмите, чтобы собрать знак Алабуги';
+  scene.querySelector('.growth-scene-caption').innerHTML=assembled?'Разложить блоки <span aria-hidden="true">↗</span>':'Собрать знак <span aria-hidden="true">↗</span>';
+ });
+ const resets=[];
+ cards.forEach(card=>{
+  let frame=0,point={x:.5,y:.5};
+  function paint(){
+   card.style.setProperty('--card-ry',((point.x-.5)*7).toFixed(2)+'deg');
+   card.style.setProperty('--card-rx',((.5-point.y)*6).toFixed(2)+'deg');
+   card.style.setProperty('--card-light-x',(point.x*100).toFixed(1)+'%');
+   card.style.setProperty('--card-light-y',(point.y*100).toFixed(1)+'%');
+   frame=0;
+  }
+  function reset(){cancelAnimationFrame(frame);frame=0;card.classList.remove('is-pointed');['--card-rx','--card-ry','--card-light-x','--card-light-y'].forEach(name=>card.style.removeProperty(name));}
+  function move(event){
+   if(reduced.matches||!fine.matches||event.pointerType==='touch')return;
+   const rect=card.getBoundingClientRect();
+   point={x:Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width)),y:Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height))};
+   card.classList.add('is-pointed');
+   if(!frame)frame=requestAnimationFrame(paint);
+  }
+  card.addEventListener('pointerenter',move);card.addEventListener('pointermove',move);
+  ['pointerleave','pointercancel'].forEach(event=>card.addEventListener(event,reset));
+  resets.push(reset);
+ });
+ function resetAll(){clearScene();resets.forEach(reset=>reset());}
+ reduced.addEventListener('change',resetAll);fine.addEventListener('change',resetAll);window.addEventListener('blur',resetAll);
+ if('IntersectionObserver' in window){
+  const visibility=new IntersectionObserver(entries=>{hero.classList.toggle('hero-motion-paused',!entries[0].isIntersecting);},{rootMargin:'100px'});
+  visibility.observe(hero);
+ }
 })();
 </script>
 </body>
