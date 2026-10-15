@@ -228,6 +228,14 @@
  .rule:hover>summary::before{opacity:1;transform:scaleY(1)}
 }
 @media screen and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){.rule:hover{transform:translateY(-2px)}}
+/* Search matches and a quiet reading-progress line below the header. */
+.search-hit{background:#dce9ff;color:#123a95;border-radius:3px;font:inherit;padding:0 .12em;margin:0 -.12em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.serious .search-hit{color:inherit}
+.reading-progress{position:absolute;left:0;right:0;bottom:-3px;height:2px;overflow:hidden;pointer-events:none}
+.reading-progress>span{display:block;width:100%;height:100%;background:linear-gradient(90deg,#1245cf,#5caeff);transform:scaleX(0);transform-origin:left center}
+@keyframes search-result-appear{from{opacity:.4;translate:0 6px}to{opacity:1;translate:0 0}}
+@media screen and (prefers-reduced-motion:no-preference){.search-reveal{animation:search-result-appear .24s cubic-bezier(.22,1,.36,1) both;animation-delay:var(--search-delay,0ms)}}
+@media print{.reading-progress{display:none}.search-hit{background:none;color:inherit;padding:0;margin:0}}
 </style>
   </head>
 <body id="top">
@@ -259,6 +267,7 @@
       </nav>
       <button class="print-button" id="print-button" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M7 8V3h10v5M7 17H4V9h16v8h-3M7 13h10v8H7z"/><path d="M17 11h1"/></svg><span>Печать</span></button>
     </div>
+    <div class="reading-progress" aria-hidden="true"><span></span></div>
   </header>
 
   <main id="content" tabindex="-1">
@@ -973,6 +982,8 @@ window.HOSTEL_DATA = {
   const aliases = {5:'окна окно проветривание',8:'чистота уборка санитария',9:'пожар огонь',10:'опоздание опоздал поздно комендантский 23 00',12:'сигареты вейп электронные сигарета никотин',13:'энергетик энергетики пиво напитки',14:'шум громко музыка тишина',16:'отсутствие ночевка заявление',17:'сигареты вейп курить курение никотин',18:'гости девушки парни',19:'сломал ущерб имущество',20:'бензин жидкость взрыв',21:'нож ножи оружие',22:'посторонние гости face id фейс',23:'питомцы животные кошка собака',24:'пистолет оружие',25:'интим близость секс',26:'переезд переселиться комната',27:'алкоголь пиво водка вино опьянение'};
   let category = 'all';
   let query = '';
+  let lastSearch = '';
+  let searchPattern = null;
   let visible = data.rules;
   const openRules = new Set([8]);
   const selectedStages = new Map();
@@ -1078,17 +1089,27 @@ window.HOSTEL_DATA = {
     if (/^(?:№|#|пункт\s*|правило\s*)?\s*0*\d+\s*$/i.test(raw)) return rule.number === Number(raw.match(/\d+/)[0]);
     return normalize(raw).split(' ').filter(Boolean).every(token => searchIndex.get(rule.number).includes(token));
   }
+  function highlight(value) {
+    const text=String(value);
+    if(!searchPattern)return escape(text);
+    let html='',offset=0;
+    for(const match of text.matchAll(searchPattern)){
+      html+=escape(text.slice(offset,match.index))+'<mark class="search-hit">'+escape(match[0])+'</mark>';
+      offset=match.index+match[0].length;
+    }
+    return html+escape(text.slice(offset));
+  }
   function renderCategories() {
     byId('category-nav').innerHTML = categoryList.map(cat => `<button type="button" class="category-button" data-category="${cat.id}" aria-pressed="${category===cat.id}"><span class="cat-icon" aria-hidden="true">${icons[cat.id]}</span><span>${escape(cat.label)}</span><span class="cat-count">${cat.id==='all'?data.rules.length:data.rules.filter(r=>r.category===cat.id).length}</span></button>`).join('');
     byId('mobile-filters').innerHTML = categoryList.map(cat => `<button type="button" data-category="${cat.id}" aria-pressed="${category===cat.id}">${escape(cat.label)}</button>`).join('');
   }
-  const itemsMarkup = items => `<ul class="stage-items">${items.map(item=>`<li${['Выселение','Исключение'].includes(item)?' class="serious"':''}><span class="sanction-marker" aria-hidden="true">•</span><span class="sanction-label">${escape(item)}</span></li>`).join('')}</ul>`;
+  const itemsMarkup = items => `<ul class="stage-items">${items.map(item=>`<li${['Выселение','Исключение'].includes(item)?' class="serious"':''}><span class="sanction-marker" aria-hidden="true">•</span><span class="sanction-label">${highlight(item)}</span></li>`).join('')}</ul>`;
   function ruleMarkup(rule) {
     const n = rule.number;
     const stage = selectedStages.get(n) || 0;
     const compare = compareRules.has(n);
     return `<details class="rule" id="rule-${n}" data-number="${n}"${openRules.has(n)?' open':''}>
-      <summary><span class="number">${String(n).padStart(2,'0')}</span><h3>${escape(rule.title)}</h3><span class="chevron" aria-hidden="true"></span></summary>
+      <summary><span class="number">${highlight(String(n).padStart(2,'0'))}</span><h3>${highlight(rule.title)}</h3><span class="chevron" aria-hidden="true"></span></summary>
       <div class="rule-body">
         <div class="sanction-header"><p>Дисциплинарное взыскание</p>${rule.stages.length>1?`<button type="button" class="compare-button" data-compare="${n}" aria-pressed="${compare}">${compare?'Выбрать случай':'Сравнить все случаи'}</button>`:''}</div>
         <div class="stage-tabs" role="tablist" aria-label="Повторение нарушения, правило ${n}"${compare?' hidden':''}>${rule.stages.map((s,i)=>`<button type="button" class="stage-tab" role="tab" id="tab-${n}-${i}" data-stage="${i}" data-rule="${n}" aria-selected="${i===stage}" aria-controls="stage-${n}-${i}" tabindex="${i===stage?0:-1}">${escape(s.label)}</button>`).join('')}</div>
@@ -1100,11 +1121,22 @@ window.HOSTEL_DATA = {
   function renderRules() {
     finishRuleMotions();
     tabsResize?.disconnect();
+    const normalizedSearch=normalize(query);
+    const searchChanged=normalizedSearch!==lastSearch;
+    lastSearch=normalizedSearch;
+    const terms=[...new Set(normalizedSearch.split(' ').filter(Boolean))].sort((a,b)=>b.length-a.length);
+    searchPattern=terms.length?new RegExp(terms.map(term=>term.replace(/е/g,'[её]')).join('|'),'gi'):null;
     visible = data.rules.filter(rule => (category==='all'||rule.category===category) && matches(rule,query));
     const shared = visible.filter(rule => rule.number<=7);
     const rest = visible.filter(rule => rule.number>7);
-    const sharedMarkup = shared.length ? `<section class="shared-group" aria-label="Общие правила и единое взыскание"><div class="group-heading"><h3>Быт и порядок</h3><span>Общее взыскание · пункты 01–07</span></div><div>${shared.map(rule=>`<div class="group-rule" id="rule-${rule.number}"><span class="number">${String(rule.number).padStart(2,'0')}</span><h3>${escape(rule.title)}</h3></div>`).join('')}</div><div class="group-sanction"><div class="group-sanction-label">Дисциплинарное взыскание<b>${escape(data.rules[0].stages[0].label)}</b></div><ul>${data.rules[0].stages[0].items.map(item=>`<li>${escape(item)}</li>`).join('')}</ul></div></section>` : '';
+    const sharedMarkup = shared.length ? `<section class="shared-group" aria-label="Общие правила и единое взыскание"><div class="group-heading"><h3>Быт и порядок</h3><span>Общее взыскание · пункты 01–07</span></div><div>${shared.map(rule=>`<div class="group-rule" id="rule-${rule.number}"><span class="number">${highlight(String(rule.number).padStart(2,'0'))}</span><h3>${highlight(rule.title)}</h3></div>`).join('')}</div><div class="group-sanction"><div class="group-sanction-label">Дисциплинарное взыскание<b>${escape(data.rules[0].stages[0].label)}</b></div><ul>${data.rules[0].stages[0].items.map(item=>`<li>${highlight(item)}</li>`).join('')}</ul></div></section>` : '';
     byId('rules-list').innerHTML = sharedMarkup+rest.map(ruleMarkup).join('');
+    if(searchChanged){
+      [...byId('rules-list').children].forEach((card,index)=>{
+        card.classList.add('search-reveal');
+        card.style.setProperty('--search-delay',Math.min(index*22,132)+'ms');
+      });
+    }
     byId('result-count').textContent = !query&&category==='all' ? 'Все 27 правил · выберите пункт, чтобы посмотреть взыскания' : `Найдено правил: ${visible.length} из 27`;
     byId('empty-state').hidden = visible.length>0;
     byId('clear-search').hidden = !query;
@@ -1280,6 +1312,29 @@ window.HOSTEL_DATA = {
   const visibility=new IntersectionObserver(entries=>{hero.classList.toggle('hero-motion-paused',!entries[0].isIntersecting);},{rootMargin:'100px'});
   visibility.observe(hero);
  }
+})();
+</script>
+<script>
+/* One scroll-frame update, including changes in document height after filtering. */
+(()=>{
+ const line=document.querySelector('.reading-progress>span');
+ if(!line)return;
+ let frame=0;
+ function paint(){
+  frame=0;
+  const page=document.scrollingElement||document.documentElement;
+  const range=page.scrollHeight-page.clientHeight;
+  const progress=range>0?Math.max(0,Math.min(1,page.scrollTop/range)):0;
+  line.style.transform='scaleX('+progress.toFixed(5)+')';
+ }
+ function schedule(){if(!frame)frame=requestAnimationFrame(paint);}
+ window.addEventListener('scroll',schedule,{passive:true});
+ window.addEventListener('resize',schedule,{passive:true});
+ window.addEventListener('pageshow',schedule);
+ window.addEventListener('hashchange',schedule);
+ document.addEventListener('toggle',schedule,true);
+ if('ResizeObserver' in window){new ResizeObserver(schedule).observe(document.body);}
+ schedule();
 })();
 </script>
 </body>
