@@ -118,6 +118,12 @@
   .stage-panel>.stage-items{justify-content:center;align-items:center}
   .stage-panel>.stage-items li{text-align:center}
 }
+
+/* A slow, soft pulse for the reminder dot. */
+@keyframes reminder-dot-pulse{0%,100%{opacity:1}50%{opacity:.25}}
+@media screen and (prefers-reduced-motion:no-preference){
+.hero .eyebrow>span{animation:reminder-dot-pulse 5s ease-in-out infinite}
+}
 </style>
   </head>
 <body>
