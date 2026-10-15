@@ -206,7 +206,7 @@
  .rule>summary::before{content:'';position:absolute;inset:15px auto 15px 0;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(#67adff,var(--blue));opacity:0;transform:scaleY(.55);pointer-events:none}
  .rule[open],.rule:focus-within{border-color:#c5d6f7;box-shadow:0 12px 28px -21px #1543b047,0 3px 8px -5px #1c37621c}
  .rule[open]>summary{background:linear-gradient(90deg,#f3f7ff,white 72%);border-bottom-color:#ecf0f6}
- .rule[open]>summary::before,.rule:focus-within>summary::before{opacity:1;transform:scaleY(1)}
+ .rule[open]>summary::before{opacity:1;transform:scaleY(1)}
  .rule.is-closing>summary .chevron{transform:rotate(45deg)}
  .rule.is-closing>summary::before{opacity:0;transform:scaleY(.55)}
  .stage-tabs{position:relative}
@@ -225,7 +225,6 @@
 }
 @media screen and (hover:hover) and (pointer:fine){
  .rule:hover{border-color:#b9cdf2;box-shadow:0 16px 32px -23px #1748b65c,0 5px 12px -7px #18396724}
- .rule:hover>summary::before{opacity:1;transform:scaleY(1)}
 }
 @media screen and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){.rule:hover{transform:translateY(-2px)}}
 /* Search matches and a quiet reading-progress line below the header. */
