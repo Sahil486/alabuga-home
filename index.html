@@ -143,7 +143,7 @@
 @media print{.brand-art{width:174px}.brand-orbit,.brand-orbit-track,.brand-halo{display:none}.brand-symbol-shell{transform:none!important;filter:none!important}}
 </style>
   </head>
-<body>
+<body id="top">
   <a class="skip-link" href="#content">К содержанию</a>
   <header class="site-header">
     <div class="header-inner">
@@ -258,7 +258,7 @@
     </section>
   </main>
 
-  <footer class="site-footer page-width"><span>Алабуга Политех</span><p>Правила проживания в корпоративном хостеле</p><a href="#rules">К началу <span aria-hidden="true">↑</span></a></footer>
+  <footer class="site-footer page-width"><span>Алабуга Политех</span><p>Правила проживания в корпоративном хостеле</p><a href="#top" id="back-to-top">К началу <span aria-hidden="true">↑</span></a></footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 window.HOSTEL_DATA = {
@@ -990,6 +990,12 @@ window.HOSTEL_DATA = {
   document.addEventListener('keydown',event=>{
     const tab=event.target.closest('[role="tab"]');if(!tab||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
     event.preventDefault();const tabs=[...tab.parentElement.querySelectorAll('[role="tab"]')];const current=tabs.indexOf(tab);const index=event.key==='Home'?0:event.key==='End'?tabs.length-1:(current+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;selectStage(Number(tab.dataset.rule),index,true);
+  });
+  byId('back-to-top').addEventListener('click',event=>{
+    event.preventDefault();
+    const reduced=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+    byId('content').focus({preventScroll:true});
+    window.scrollTo({top:0,behavior:reduced?'instant':'smooth'});
   });
   window.addEventListener('hashchange',()=>navigateHash());
   let beforePrintOpen=[];
