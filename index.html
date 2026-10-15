@@ -235,6 +235,21 @@
 @keyframes search-result-appear{from{opacity:.4;translate:0 6px}to{opacity:1;translate:0 0}}
 @media screen and (prefers-reduced-motion:no-preference){.search-reveal{animation:search-result-appear .24s cubic-bezier(.22,1,.36,1) both;animation-delay:var(--search-delay,0ms)}}
 @media print{.reading-progress{display:none}.search-hit{background:none;color:inherit;padding:0;margin:0}}
+/* Give the advice accordions the same calm motion as the rule cards. */
+@media screen{
+ .faq{box-shadow:0 3px 10px -8px #203d7830}
+ .faq[open]:not(.is-closing){border-color:#c5d6f7;box-shadow:0 12px 28px -21px #1543b047,0 3px 8px -5px #1c37621c}
+ .faq.is-closing .faq-number{background:var(--pale);color:var(--blue)}
+ .faq.is-closing>summary .chevron{transform:rotate(45deg)}
+}
+@media screen and (prefers-reduced-motion:no-preference){
+ .faq{transition:box-shadow .3s ease,border-color .3s ease,transform .3s cubic-bezier(.22,1,.36,1)}
+ .faq-number{transition:background-color .28s ease,color .28s ease,transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s ease}
+ .faq[open]:not(.is-closing) .faq-number{transform:scale(1.04);box-shadow:0 3px 8px -4px #1245cf55}
+ .faq>summary .chevron{transition:transform .3s cubic-bezier(.22,1,.36,1)}
+}
+@media screen and (hover:hover) and (pointer:fine){.faq:hover{border-color:#b9cdf2;box-shadow:0 16px 32px -23px #1748b65c,0 5px 12px -7px #18396724}}
+@media screen and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){.faq:hover{transform:translateY(-2px)}}
 </style>
   </head>
 <body id="top">
@@ -1021,21 +1036,21 @@ window.HOSTEL_DATA = {
   function finishRuleMotions() {
     [...disclosureMotions.values(),...stageMotions.values()].forEach(motion=>motion.finish());
   }
-  function setRuleOpen(card, expanded, animated=true) {
+  function setDisclosureOpen(card, expanded, animated=true) {
     const previous=disclosureMotions.get(card);
     if(previous?.expanded===expanded||(!previous&&card.open===expanded))return;
     const fromHeight=card.getBoundingClientRect().height;
-    const body=card.querySelector('.rule-body');
+    const isRule=card.matches('.rule');
+    const body=card.querySelector(isRule?'.rule-body':'.faq-text');
     const wasOpen=card.open;
     const fromOpacity=wasOpen?getComputedStyle(body).opacity:'0';
     previous?.finish();
     stageMotions.get(card)?.finish();
-    const n=Number(card.dataset.number);
-    if(expanded)openRules.add(n);else openRules.delete(n);
+    if(isRule){const n=Number(card.dataset.number);if(expanded)openRules.add(n);else openRules.delete(n);}
     if(!animated||!motionAllowed(card)){
       card.open=expanded;
       syncStageIndicator(card);
-      updateExpandButton();
+      if(isRule)updateExpandButton();
       return;
     }
     card.open=true;
@@ -1052,11 +1067,11 @@ window.HOSTEL_DATA = {
       card.open=expanded;
       card.classList.remove('is-closing');
       animation.cancel();bodyAnimation.cancel();
-      updateExpandButton();
+      if(isRule)updateExpandButton();
     }};
     disclosureMotions.set(card,record);
     animation.onfinish=()=>record.finish();
-    updateExpandButton();
+    if(isRule)updateExpandButton();
   }
   function showStage(card,index,animated=true) {
     disclosureMotions.get(card)?.finish();
@@ -1189,7 +1204,7 @@ window.HOSTEL_DATA = {
       byId('contacts-link').setAttribute('aria-current','location');
       requestAnimationFrame(()=>byId('contacts').scrollIntoView({behavior:initial?'instant':'smooth',block:'start'}));
     } else if(hash.startsWith('faq-')) {
-      setView('advice');const faq=byId(hash);if(faq){faq.open=true;requestAnimationFrame(()=>faq.scrollIntoView({behavior:initial?'instant':'smooth',block:'start'}));}
+      setView('advice');const faq=byId(hash);if(faq){setDisclosureOpen(faq,true,!initial);requestAnimationFrame(()=>faq.scrollIntoView({behavior:initial?'instant':'smooth',block:'start'}));}
     } else if(hash.startsWith('rule-')) {
       setView('rules');category='all';query='';byId('search').value='';
       const n=Number(hash.slice(5));openRules.add(n);renderCategories();renderRules();
@@ -1204,10 +1219,10 @@ window.HOSTEL_DATA = {
   byId('search').addEventListener('input',event=>{query=event.target.value;renderRules();});
   byId('clear-search').addEventListener('click',()=>{query='';byId('search').value='';renderRules();byId('search').focus();});
   byId('reset-filters').addEventListener('click',()=>{category='all';query='';byId('search').value='';renderCategories();renderRules();byId('search').focus();});
-  byId('expand-all').addEventListener('click',()=>{const cards=[...document.querySelectorAll('details.rule')];const expand=!cards.every(card=>disclosureMotions.get(card)?.expanded??card.open);cards.forEach(card=>setRuleOpen(card,expand));updateExpandButton();});
+  byId('expand-all').addEventListener('click',()=>{const cards=[...document.querySelectorAll('details.rule')];const expand=!cards.every(card=>disclosureMotions.get(card)?.expanded??card.open);cards.forEach(card=>setDisclosureOpen(card,expand));updateExpandButton();});
   document.addEventListener('click',async event=>{
-    const summary=event.target.closest('details.rule>summary');
-    if(summary){event.preventDefault();const card=summary.parentElement;setRuleOpen(card,!(disclosureMotions.get(card)?.expanded??card.open));return;}
+    const summary=event.target.closest('details.rule>summary,details.faq>summary');
+    if(summary){event.preventDefault();const card=summary.parentElement;setDisclosureOpen(card,!(disclosureMotions.get(card)?.expanded??card.open));return;}
     const categoryButton=event.target.closest('[data-category]');
     if(categoryButton){category=categoryButton.dataset.category;renderCategories();renderRules();return;}
     const tab=event.target.closest('[data-stage]');if(tab){selectStage(Number(tab.dataset.rule),Number(tab.dataset.stage));return;}
