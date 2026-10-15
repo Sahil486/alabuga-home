@@ -77,7 +77,8 @@
 .quick-contact-names{display:flex;flex-direction:column;font-size:20px;line-height:1.4;letter-spacing:-.025em;font-weight:750;margin:16px 0 20px;position:relative;z-index:1}
 .quick-contacts-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:9px;border-top:1px solid #ffffff30;padding-top:13px;margin-top:auto;position:relative;z-index:1}
 .quick-contacts-bottom>span:last-child{font-size:16px}
-.stage-panel.single-sanction{min-height:0}
+.stage-panel{min-height:0}
+
 .stage-panels.compare-mode{align-items:start}
 @media(max-width:1100px){.quick-contacts{padding:22px 18px}.hero-cards .curfew{padding:22px 18px}.quick-contact-names{font-size:19px}}
 @media(max-width:1000px){.hero{display:block}.hero-cards{margin-top:24px}.curfew-time{font-size:55px}}
@@ -92,6 +93,31 @@
 }
 @media print{.hero-cards{display:none!important}}
 
+
+/* Align the blue-card footers and strengthen the rule-count introduction. */
+@media screen and (min-width:561px){
+  .hero-cards .curfew{display:flex;flex-direction:column}
+  .hero-cards .curfew>p:not(.curfew-time){margin-bottom:20px}
+  .hero-cards .curfew>a{margin-top:auto}
+  .hero-cards .curfew>a,.hero-cards .quick-contacts-bottom{min-height:40px;flex-shrink:0;gap:12px;padding-top:13px;font-size:9px;line-height:1.5}
+}
+.note-symbol{display:inline-grid;place-items:center;padding:0;line-height:1}
+.note-symbol svg{display:block;width:17px;height:17px}
+.hero-facts{margin-top:24px}
+.hero-facts>span{display:inline-flex;align-items:baseline;gap:10px;color:var(--deep);font-size:17px;font-weight:650;line-height:1.15;letter-spacing:-.025em}
+.hero-facts b{margin:0;color:var(--blue);font-size:40px;font-weight:800;line-height:1;letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+@media screen and (max-width:560px){
+  .hero-facts{margin-top:20px}
+  .hero-facts>span{font-size:16px;gap:9px}
+  .hero-facts b{font-size:34px}
+}
+
+/* Center the complete sanction list within its white panel. */
+@media screen{
+  .stage-panel{display:flex;flex-direction:column;justify-content:center;width:100%}
+  .stage-panel>.stage-items{justify-content:center;align-items:center}
+  .stage-panel>.stage-items li{text-align:center}
+}
 </style>
   </head>
 <body>
@@ -139,7 +165,7 @@
           <p class="sidebar-label" id="sidebar-label">Темы правил</p>
           <nav id="category-nav" class="category-nav" aria-label="Фильтр по теме"></nav>
           <nav id="advice-nav" class="advice-nav" aria-label="Ситуации" hidden></nav>
-          <div class="sidebar-note"><span class="note-symbol" aria-hidden="true">?</span><h2>Лучше уточнить заранее</h2><p>Если сомневаетесь, обратитесь в администрацию «Каллисто» или HR.</p><a href="#faq-7">Объяснительная в кабинете 202 <span aria-hidden="true">↗</span></a></div>
+          <div class="sidebar-note"><span class="note-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" focusable="false"><path d="M8.5 9C8.5 7.067 10.067 5.5 12 5.5S15.5 7.067 15.5 9C15.5 11.5 12 11.5 12 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="18.4" r="1" fill="currentColor"/></svg></span><h2>Лучше уточнить заранее</h2><p>Если сомневаетесь, обратитесь в администрацию «Каллисто» или HR.</p><a href="#faq-7">Объяснительная в кабинете 202 <span aria-hidden="true">↗</span></a></div>
         </div>
       </aside>
 
