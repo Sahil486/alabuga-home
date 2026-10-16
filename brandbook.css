@@ -1,6 +1,7 @@
 /* Source: the Alabuga brandbook supplied by the project owner, October 2026.
    Exact palette, original Alabuga Sans faces and the Polytech project logo.
-   Motion belongs to supporting synergy graphics, outside the logo clear space. */
+   Supporting synergy graphics and a short owner-requested symbol animation.
+   The original path geometry, colours and wordmark remain intact. */
 @font-face{font-family:"Alabuga Sans";src:url('./alabuga-sans-regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
 @font-face{font-family:"Alabuga Sans";src:url('./alabuga-sans-medium.woff2') format('woff2');font-style:normal;font-weight:500 600;font-display:swap}
 @font-face{font-family:"Alabuga Display";src:url('./alabuga-sans-bold.woff2') format('woff2');font-style:normal;font-weight:700;font-display:swap}
@@ -13,6 +14,31 @@ h1,h2,h3,.hero-facts b,.number,.curfew-numerals,.quick-contact-names,.xp-entry s
 h1,h2,h3{font-weight:700}.eyebrow{font-weight:500;letter-spacing:.11em}
 ::selection{background:#deeefd;color:#000d3c}
 .brand{padding:0}.brand-art{display:block;width:196px;height:auto;pointer-events:none;overflow:visible}.brand-wordmark{fill:#1b1b1b}
+/* One short assembly, then a single travelling wave on hover or keyboard focus.
+   No fill-forwards transform or continuous animation on the logo text. */
+.brand-symbol > path:nth-child(1){--brand-x:0px;--brand-y:-7px;--brand-delay:140ms;--brand-order:2}
+.brand-symbol > path:nth-child(2){--brand-x:7px;--brand-y:-4px;--brand-delay:110ms;--brand-order:3}
+.brand-symbol > path:nth-child(3){--brand-x:10px;--brand-y:4px;--brand-delay:0ms;--brand-order:4}
+.brand-symbol > path:nth-child(4){--brand-x:-7px;--brand-y:-4px;--brand-delay:110ms;--brand-order:1}
+.brand-symbol > path:nth-child(5){--brand-x:0px;--brand-y:9px;--brand-delay:280ms;--brand-order:5}
+.brand-symbol > path:nth-child(6){--brand-x:-10px;--brand-y:4px;--brand-delay:0ms;--brand-order:0}
+@keyframes brand-segment-arrive {
+  from{opacity:0;transform:translate(var(--brand-x),var(--brand-y))}
+  to{opacity:1;transform:none}
+}
+@keyframes brand-segment-wave {
+  0%,100%{opacity:1;transform:none}
+  32%{opacity:.65;transform:translateY(-3px)}
+  64%{opacity:1;transform:none}
+}
+@media screen and (prefers-reduced-motion:no-preference) {
+  .brand-symbol > path {
+    animation:brand-segment-arrive 760ms cubic-bezier(.22,1,.36,1) calc(80ms + var(--brand-delay)) 1 backwards;
+  }
+  .brand:is(:hover,:focus-visible) .brand-symbol > path {
+    animation:brand-segment-wave 1050ms cubic-bezier(.22,1,.36,1) calc(var(--brand-order) * 65ms) 1 backwards;
+  }
+}
 .site-header{background:#fff;border-color:#cccfd899}.primary-nav a{font-size:13px;font-weight:500}.print-button{font-weight:500}.reading-progress>span{background:linear-gradient(90deg,#0c6ff1,#69cff7)}
 .hero{padding-top:48px;padding-bottom:38px}.hero h1{font-weight:800;line-height:1.08;letter-spacing:-.025em;font-size:clamp(32px,3.35vw,43px)}
 .hero-description{font-size:14px;line-height:1.65;color:var(--muted)}.hero-facts>span{font-size:18px;color:var(--deep);font-weight:500}.hero-facts b{font-weight:900;font-size:44px;letter-spacing:-.045em}
