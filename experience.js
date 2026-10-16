@@ -148,7 +148,7 @@
  function resultTitle(score){return score===5?'Идеальный сосед':score===4?'Почти эксперт':score===3?'Хороший старт':'Разбираемся вместе';}
  function qrSvg(){
   const n=QR_MATRIX.length;let path='';QR_MATRIX.forEach((row,y)=>row.forEach((cell,x)=>{if(cell)path+='M'+(x+4)+' '+(y+4)+'h1v1h-1z';}));
-  return '<svg class="xp-qr" viewBox="0 0 '+(n+8)+' '+(n+8)+'" role="img" aria-label="QR-код: пройти мини-квест" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="white"/><path d="'+path+'" fill="#0b2881"/></svg>';
+  return '<svg class="xp-qr" viewBox="0 0 '+(n+8)+' '+(n+8)+'" role="img" aria-label="QR-код: пройти мини-квест" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="white"/><path d="'+path+'" fill="#000d3c"/></svg>';
  }
  function renderResult(){
   quiz.complete=true;last=quiz.score;best=Math.max(best,last);persist();
@@ -189,18 +189,19 @@
  async function downloadResult(button){
   if(!quiz?.complete||button.disabled)return;const status=document.getElementById('xp-result-status');button.disabled=true;button.textContent='Готовлю PNG…';
   try{
+   await Promise.all([document.fonts.load('500 30px "Alabuga Sans"'),document.fonts.load('800 62px "Alabuga Display"')]);
    await document.fonts.ready;
    const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;const ctx=canvas.getContext('2d');
-   ctx.fillStyle='#f1f5ff';ctx.fillRect(0,0,1080,1350);
-   const logo=document.querySelector('.brand-art').cloneNode(true);logo.querySelectorAll('.brand-orbit,.brand-orbit-track,.brand-halo').forEach(node=>node.remove());logo.querySelector('.brand-wordmark')?.setAttribute('fill','#15223d');
-   const picture=new Image();picture.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(logo));await picture.decode();ctx.drawImage(picture,64,50,344,108);
-   ctx.fillStyle='#61728e';ctx.font='700 24px Montserrat,Arial,sans-serif';ctx.fillText('ПРОВЕРКА СЕБЯ · 5 СИТУАЦИЙ',64,231);
-   ctx.fillStyle='#1245cf';ctx.font='800 188px Montserrat,Arial,sans-serif';ctx.fillText(String(quiz.score),55,444);const width=ctx.measureText(String(quiz.score)).width;ctx.font='750 84px Montserrat,Arial,sans-serif';ctx.fillStyle='#8096bc';ctx.fillText('/ 5',75+width,438);
-   ctx.font='800 62px Montserrat,Arial,sans-serif';ctx.fillStyle='#15223d';const bottom=wrapText(ctx,resultTitle(quiz.score),64,568,940,76);
-   ctx.font='500 30px Montserrat,Arial,sans-serif';ctx.fillStyle='#61728e';wrapText(ctx,'Проверил себя в пяти ситуациях из жизни хостела.',64,bottom+30,850,46);
-   roundRect(ctx,64,810,952,449,28,'#1245cf');ctx.fillStyle='#fff';ctx.font='800 56px Montserrat,Arial,sans-serif';ctx.fillText('Твой ход.',104,907);ctx.font='600 28px Montserrat,Arial,sans-serif';wrapText(ctx,'Проверь себя за минуту',104,965,470,42);ctx.font='600 25px Montserrat,Arial,sans-serif';ctx.fillStyle='#d2e5ff';ctx.fillText('27 правил · Алабуга Политех',104,1166);
-   const size=QR_MATRIX.length+8,module=7,x=1016-40-size*module,y=870;roundRect(ctx,x-15,y-15,size*module+30,size*module+30,15,'#fff');ctx.fillStyle='#0b2881';QR_MATRIX.forEach((row,ry)=>row.forEach((cell,rx)=>{if(cell)ctx.fillRect(x+(rx+4)*module,y+(ry+4)*module,module,module);}));
-   ctx.fillStyle='#61728e';ctx.font='600 25px Montserrat,Arial,sans-serif';ctx.fillText('alabuga-home.ru',64,1310);
+   ctx.fillStyle='#f6fafe';ctx.fillRect(0,0,1080,1350);
+   const logo=document.querySelector('.brand-art').cloneNode(true);logo.querySelectorAll('.brand-orbit,.brand-orbit-track,.brand-halo').forEach(node=>node.remove());logo.querySelector('.brand-wordmark')?.setAttribute('fill','#161616');
+   const picture=new Image();picture.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(new XMLSerializer().serializeToString(logo));await picture.decode();ctx.drawImage(picture,64,30,344,344*75/180);
+   ctx.fillStyle='#4e596d';ctx.font='700 24px "Alabuga Display",Arial,sans-serif';ctx.fillText('ПРОВЕРКА СЕБЯ · 5 СИТУАЦИЙ',64,231);
+   ctx.fillStyle='#0c6ff1';ctx.font='800 188px "Alabuga Display",Arial,sans-serif';ctx.fillText(String(quiz.score),55,444);const width=ctx.measureText(String(quiz.score)).width;ctx.font='800 84px "Alabuga Display",Arial,sans-serif';ctx.fillStyle='#8096bc';ctx.fillText('/ 5',75+width,438);
+   ctx.font='800 62px "Alabuga Display",Arial,sans-serif';ctx.fillStyle='#161616';const bottom=wrapText(ctx,resultTitle(quiz.score),64,568,940,76);
+   ctx.font='500 30px "Alabuga Sans",Arial,sans-serif';ctx.fillStyle='#4e596d';wrapText(ctx,'Проверил себя в пяти ситуациях из жизни хостела.',64,bottom+30,850,46);
+   roundRect(ctx,64,810,952,449,28,'#0c6ff1');ctx.fillStyle='#fff';ctx.font='800 56px "Alabuga Display",Arial,sans-serif';ctx.fillText('Твой ход.',104,907);ctx.font='600 28px "Alabuga Sans",Arial,sans-serif';wrapText(ctx,'Проверь себя за минуту',104,965,470,42);ctx.font='600 25px "Alabuga Sans",Arial,sans-serif';ctx.fillStyle='#d2e5ff';ctx.fillText('27 правил · Алабуга Политех',104,1166);
+   const size=QR_MATRIX.length+8,module=7,x=1016-40-size*module,y=870;roundRect(ctx,x-15,y-15,size*module+30,size*module+30,15,'#fff');ctx.fillStyle='#000d3c';QR_MATRIX.forEach((row,ry)=>row.forEach((cell,rx)=>{if(cell)ctx.fillRect(x+(rx+4)*module,y+(ry+4)*module,module,module);}));
+   ctx.fillStyle='#4e596d';ctx.font='600 25px "Alabuga Sans",Arial,sans-serif';ctx.fillText('alabuga-home.ru',64,1310);
    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)throw new Error('PNG export failed');const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download='alabuga-result-'+quiz.score+'-of-5.png';link.click();setTimeout(()=>URL.revokeObjectURL(url),30000);status.textContent='Готово. QR-код ведёт на мини-квест.';
   }catch{status.textContent='Не удалось сохранить картинку. Попробуй скачать ещё раз.';}finally{button.disabled=false;button.innerHTML='Скачать PNG <span aria-hidden="true">↓</span>';}
  }
@@ -234,7 +235,7 @@
  window.addEventListener('hashchange',route);window.addEventListener('popstate',route);
  const themeButton=document.getElementById('theme-toggle');
  function applyTheme(theme){
-  const dark=theme==='dark';document.documentElement.dataset.theme=dark?'dark':'light';themeButton.setAttribute('aria-pressed',String(dark));themeButton.setAttribute('aria-label',dark?'Включить светлую тему':'Включить тёмную тему');themeButton.title=dark?'Светлая тема':'Тёмная тема';document.querySelector('meta[name="theme-color"]').content=dark?'#0a1223':'#1245cf';
+  const dark=theme==='dark';document.documentElement.dataset.theme=dark?'dark':'light';themeButton.setAttribute('aria-pressed',String(dark));themeButton.setAttribute('aria-label',dark?'Включить светлую тему':'Включить тёмную тему');themeButton.title=dark?'Светлая тема':'Тёмная тема';document.querySelector('meta[name="theme-color"]').content=dark?'#0a1223':'#0c6ff1';
   try{localStorage.setItem('alabuga-theme',dark?'dark':'light');}catch{}
  }
  themeButton.addEventListener('click',()=>{clearTimeout(themeTimer);document.documentElement.classList.add('theme-switching');applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');themeTimer=setTimeout(()=>document.documentElement.classList.remove('theme-switching'),420);});
