@@ -20,7 +20,7 @@
  let studyIndex=Number.isInteger(saved.index)&&saved.index>=0&&saved.index<data.rules.length?saved.index:0;
  let best=Number.isInteger(saved.best)&&saved.best>=0&&saved.best<=5?saved.best:0;
  let last=Number.isInteger(saved.last)&&saved.last>=0&&saved.last<=5?saved.last:null;
- let mode='',returnHash='#rules',returnFocus=null,busy=false,swapToken=0,swapAnimation=null,studyLater=false,quiz=null,themeTimer=0;
+ let mode='',returnRoute='rules',returnFocus=null,busy=false,swapToken=0,swapAnimation=null,studyLater=false,quiz=null,themeTimer=0;
  const source=q=>q.rule?{id:'rule-'+q.rule,title:'Пункт '+String(q.rule).padStart(2,'0')+' · '+data.rules.find(rule=>rule.number===q.rule).title}:{id:'faq-'+q.faq,title:data.faq.find(item=>item.number===q.faq).title};
  const ruleScenario=(number,title,choices,explanation)=>({id:'rule-'+number,rule:number,title,question:'Как поступишь?',choices,correct:0,explanation});
  const sanctionScenario=(number,stageIndex,title,alternatives)=>{
@@ -111,9 +111,9 @@
  function openExperience(next,changeUrl=true){
   if(!['quest','learn'].includes(next))return;
   if(dialog.open&&mode===next)return;
-  if(!dialog.open){returnHash=['#quest','#learn'].includes(location.hash)?'#rules':(location.hash||'#rules');returnFocus=document.activeElement;dialog.showModal();document.body.classList.add('xp-modal-open');}
+  if(!dialog.open){returnRoute=['quest','learn'].includes(HostelRoutes.current())?'rules':HostelRoutes.current();returnFocus=document.activeElement;dialog.showModal();document.body.classList.add('xp-modal-open');}
   ++swapToken;busy=false;body.removeAttribute('aria-busy');swapAnimation?.cancel();mode=next;
-  if(changeUrl&&location.hash!=='#'+next)history.pushState({experience:next},'','#'+next);
+  if(changeUrl&&HostelRoutes.current()!==next)HostelRoutes.go(next,{notify:false});
   title.textContent=next==='quest'?'Разрули ситуацию':'27 из 27';
   if(next==='quest'){
    quiz={questions:createRound(recentQuiz),index:0,score:0,answered:false,selected:null,complete:false};
@@ -125,10 +125,10 @@
  function closeExperience(changeUrl=true){
   ++swapToken;busy=false;body.removeAttribute('aria-busy');swapAnimation?.cancel();
   if(dialog.open)dialog.close();document.body.classList.remove('xp-modal-open');mode='';
-  if(changeUrl&&['#quest','#learn'].includes(location.hash))history.replaceState(null,'',returnHash);
+  if(changeUrl&&['quest','learn'].includes(HostelRoutes.current()))HostelRoutes.go(returnRoute,{replace:true,notify:false});
   if(returnFocus&&returnFocus.isConnected&&returnFocus!==document.body)returnFocus.focus({preventScroll:true});
  }
- function route(){const hash=location.hash.slice(1);if(['quest','learn'].includes(hash))openExperience(hash,false);else if(dialog.open)closeExperience(false);}
+ function route(){const hash=HostelRoutes.current();if(['quest','learn'].includes(hash))openExperience(hash,false);else if(dialog.open)closeExperience(false);}
  function progressMarkup(index){return '<div class="xp-mode-meta"><span>Ситуация '+(index+1)+' из '+QUIZ_LENGTH+'</span><span class="xp-dots" aria-hidden="true">'+Array.from({length:QUIZ_LENGTH},(_,i)=>'<i'+(i<=index?' class="is-done"':'')+'></i>').join('')+'</span></div>';}
  function renderQuestion(){
   const q=quiz.questions[quiz.index];quiz.answered=false;quiz.selected=null;
@@ -143,7 +143,7 @@
  }
  function renderFeedback(){
   const q=quiz.questions[quiz.index],correct=q.options[quiz.selected].correct,reference=source(q);
-  body.innerHTML='<section class="xp-mode-panel">'+progressMarkup(quiz.index)+'<div class="xp-feedback-mark'+(correct?'':' is-review')+'" aria-hidden="true">'+(correct?'✓':'↗')+'</div><h3 data-panel-heading>'+(correct?'Всё верно!':'Давай разберёмся.')+'</h3><div class="xp-answer">'+esc(q.explanation)+'</div><a href="#'+reference.id+'" class="xp-source" data-open-source="'+reference.id+'">Подробнее: '+esc(reference.title)+' <span aria-hidden="true">↗</span></a><div class="xp-actions"><button type="button" class="xp-btn xp-btn--primary" data-quest-next>'+(quiz.index===QUIZ_LENGTH-1?'Посмотреть результат':'Следующая ситуация')+' <span aria-hidden="true">→</span></button></div></section>';
+  body.innerHTML='<section class="xp-mode-panel">'+progressMarkup(quiz.index)+'<div class="xp-feedback-mark'+(correct?'':' is-review')+'" aria-hidden="true">'+(correct?'✓':'↗')+'</div><h3 data-panel-heading>'+(correct?'Всё верно!':'Давай разберёмся.')+'</h3><div class="xp-answer">'+esc(q.explanation)+'</div><a href="'+HostelRoutes.url(reference.id)+'" class="xp-source" data-open-source="'+reference.id+'">Подробнее: '+esc(reference.title)+' <span aria-hidden="true">↗</span></a><div class="xp-actions"><button type="button" class="xp-btn xp-btn--primary" data-quest-next>'+(quiz.index===QUIZ_LENGTH-1?'Посмотреть результат':'Следующая ситуация')+' <span aria-hidden="true">→</span></button></div></section>';
  }
  function resultTitle(score){return score===5?'Идеальный сосед':score===4?'Почти эксперт':score===3?'Хороший старт':'Разбираемся вместе';}
  function qrSvg(){
@@ -168,7 +168,7 @@
   if(studyLater&&!later.size){renderLaterComplete();return;}
   if(studyLater&&!later.has(data.rules[studyIndex].number))studyIndex=data.rules.findIndex(rule=>later.has(rule.number));
   const rule=data.rules[studyIndex];
-  body.innerHTML='<section class="xp-mode-panel"><div class="xp-study-top"><span class="xp-study-count">'+known.size+' / 27 изучено</span><button type="button" class="xp-study-filter" data-study-filter aria-pressed="'+studyLater+'">Повторить позже: '+later.size+'</button></div><div class="xp-study-progress" role="progressbar" aria-label="Изученные правила" aria-valuemin="0" aria-valuemax="27" aria-valuenow="'+known.size+'"><span style="width:'+(known.size/27*100)+'%"></span></div><article class="xp-study-card"><div class="xp-study-caption"><span class="xp-study-number">'+String(rule.number).padStart(2,'0')+'</span><span>'+esc(categoryName(rule.category))+'</span>'+(known.has(rule.number)?'<span class="xp-known-tag">✓ Уже изучено</span>':'')+'</div><h3 data-panel-heading>'+esc(rule.title)+'</h3><div class="xp-study-stages">'+rule.stages.map(stage=>'<section class="xp-study-stage"><h4>'+esc(stage.label)+'</h4><ul>'+stage.items.map(item=>'<li>'+esc(item)+'</li>').join('')+'</ul></section>').join('')+'</div></article><div class="xp-actions"><button type="button" class="xp-btn xp-btn--primary" data-study-known>Понятно <span aria-hidden="true">✓</span></button><button type="button" class="xp-btn" data-study-later>Повторить позже</button><a href="#rule-'+rule.number+'" class="xp-btn xp-btn--quiet" data-open-source="rule-'+rule.number+'">Открыть в списке ↗</a></div><div class="xp-study-bottom"><span>Листай свайпом или стрелками</span><div class="xp-study-arrows"><button type="button" data-study-prev aria-label="Предыдущее правило">←</button><button type="button" data-study-next aria-label="Следующее правило">→</button></div></div><details class="xp-study-jump"><summary>Выбрать пункт</summary><div class="xp-study-index">'+data.rules.map((item,i)=>'<button type="button" data-study-jump="'+i+'" aria-label="Пункт '+item.number+(known.has(item.number)?', изучен':'')+'" aria-current="'+(i===studyIndex)+'" class="'+(known.has(item.number)?'is-known':'')+'">'+item.number+'</button>').join('')+'</div></details></section>';
+  body.innerHTML='<section class="xp-mode-panel"><div class="xp-study-top"><span class="xp-study-count">'+known.size+' / 27 изучено</span><button type="button" class="xp-study-filter" data-study-filter aria-pressed="'+studyLater+'">Повторить позже: '+later.size+'</button></div><div class="xp-study-progress" role="progressbar" aria-label="Изученные правила" aria-valuemin="0" aria-valuemax="27" aria-valuenow="'+known.size+'"><span style="width:'+(known.size/27*100)+'%"></span></div><article class="xp-study-card"><div class="xp-study-caption"><span class="xp-study-number">'+String(rule.number).padStart(2,'0')+'</span><span>'+esc(categoryName(rule.category))+'</span>'+(known.has(rule.number)?'<span class="xp-known-tag">✓ Уже изучено</span>':'')+'</div><h3 data-panel-heading>'+esc(rule.title)+'</h3><div class="xp-study-stages">'+rule.stages.map(stage=>'<section class="xp-study-stage"><h4>'+esc(stage.label)+'</h4><ul>'+stage.items.map(item=>'<li>'+esc(item)+'</li>').join('')+'</ul></section>').join('')+'</div></article><div class="xp-actions"><button type="button" class="xp-btn xp-btn--primary" data-study-known>Понятно <span aria-hidden="true">✓</span></button><button type="button" class="xp-btn" data-study-later>Повторить позже</button><a href="'+HostelRoutes.url('rule-'+rule.number)+'" class="xp-btn xp-btn--quiet" data-open-source="rule-'+rule.number+'">Открыть в списке ↗</a></div><div class="xp-study-bottom"><span>Листай свайпом или стрелками</span><div class="xp-study-arrows"><button type="button" data-study-prev aria-label="Предыдущее правило">←</button><button type="button" data-study-next aria-label="Следующее правило">→</button></div></div><details class="xp-study-jump"><summary>Выбрать пункт</summary><div class="xp-study-index">'+data.rules.map((item,i)=>'<button type="button" data-study-jump="'+i+'" aria-label="Пункт '+item.number+(known.has(item.number)?', изучен':'')+'" aria-current="'+(i===studyIndex)+'" class="'+(known.has(item.number)?'is-known':'')+'">'+item.number+'</button>').join('')+'</div></details></section>';
  }
  function renderStudyComplete(){body.innerHTML='<section class="xp-mode-panel"><div class="xp-complete-symbol">27 / 27</div><h3 data-panel-heading>Все пункты изучены.</h3><p class="xp-lead">Прогресс сохранён. Можно проверить себя на пяти ситуациях или вернуться к любому правилу.</p><div class="xp-actions"><button type="button" class="xp-btn xp-btn--primary" data-switch-mode="quest">Разрули ситуацию →</button><button type="button" class="xp-btn" data-study-review>Посмотреть правила</button><button type="button" class="xp-btn xp-btn--quiet" data-study-reset>Начать заново</button></div></section>';}
  function renderLaterComplete(){body.innerHTML='<section class="xp-mode-panel"><div class="xp-feedback-mark" aria-hidden="true">✓</div><h3 data-panel-heading>Здесь пока пусто.</h3><p class="xp-lead">В отложенных остаются только пункты, к которым ты решил вернуться. Всё уже повторено или ещё не отложено.</p><div class="xp-actions"><button type="button" class="xp-btn xp-btn--primary" data-study-all>Ко всем правилам →</button></div></section>';}
@@ -232,7 +232,7 @@
  });
  dialog.addEventListener('cancel',event=>{event.preventDefault();closeExperience();});
  dialog.addEventListener('keydown',event=>{if(mode==='learn'&&!busy&&['ArrowLeft','ArrowRight'].includes(event.key)&&!event.target.closest('input,textarea,select')){event.preventDefault();moveStudy(event.key==='ArrowRight'?1:-1);}});
- window.addEventListener('hashchange',route);window.addEventListener('popstate',route);
+ window.addEventListener('hostel:route',route);
  const themeButton=document.getElementById('theme-toggle');
  function applyTheme(theme){
   const dark=theme==='dark';document.documentElement.dataset.theme=dark?'dark':'light';themeButton.setAttribute('aria-pressed',String(dark));themeButton.setAttribute('aria-label',dark?'Включить светлую тему':'Включить тёмную тему');themeButton.title=dark?'Светлая тема':'Тёмная тема';document.querySelector('meta[name="theme-color"]').content=dark?'#0a1223':'#0c6ff1';
