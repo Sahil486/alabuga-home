@@ -30,6 +30,44 @@
  function frontPatch(x,y,z,w,h,paint,type='',seed=0){return patch(quad(x-w/2,y,z,x+w/2,y,z,x+w/2,y,z+h,x-w/2,y,z+h),paint,type,seed);}
  function sidePatch(x,y,z,w,h,paint,type='',seed=0){return patch(quad(x,y-w/2,z,x,y+w/2,z,x,y+w/2,z+h,x,y-w/2,z+h),paint,type,seed);}
  function topPatch(x,y,z,w,d,paint,type=''){return patch(quad(x-w/2,y-d/2,z,x+w/2,y-d/2,z,x+w/2,y+d/2,z,x-w/2,y+d/2,z),paint,type);}
+ function airConditioner(out,x,y,z,side=false,scale=1,floorNumber=0){
+  const pieces=[],front=[],fan=[];
+  for(let i=0;i<16;i++){const a=TAU*i/16;fan.push(P(-.9+Math.cos(a)*1.03,1.21,1.45+Math.sin(a)*1.03));}
+  front.push(patch(fan,'#8da1b5'));
+  for(let i=0;i<4;i++)front.push(frontPatch(-.9,1.23,.6+i*.48,2.2,.16,'#b8c7d7'));
+  for(let i=0;i<4;i++)front.push(frontPatch(1.9,1.23,.7+i*.45,1,.12,'#a1b3c7'));
+  box(pieces,0,0,0,6,2.3,2.9,{front:'#f5f7f8',side:'#cbd6e2',roof:'#ffffff'},{front,kind:'air-conditioning'});
+  for(const bx of[-2,2])box(pieces,bx,-.1,-.6,.45,2.4,.6,{wall:'#a3b4c7',roof:'#b9c7d8'},{kind:'air-conditioning'});
+  const point=p=>side?P(x+p[1]*scale,y-p[0]*scale,z+p[2]*scale):P(x+p[0]*scale,y+p[1]*scale,z+p[2]*scale);
+  const normal=n=>side?P(n[1],-n[0],n[2]):n;
+  out.push(...pieces.map(f=>({...f,points:f.points.map(point),center:point(f.center),normal:normal(f.normal),floorNumber,details:f.details.map(d=>({...d,points:d.points.map(point)}))})));
+ }
+ function rooftopShuttle(out,x,y,z){
+  const point=p=>P(x+p[0],y+p[1],z+p[2]);
+  function face(points,paint){
+   const world=points.map(point),plane=polygonPlane(world);
+   if(plane)out.push(surface(world,plane.normal,paint,[],'roof-macquette'));
+  }
+  function horizontalPrism(outline,bottom,height,paint){
+   const top=outline.map(p=>P(p[0],p[1],bottom+height));
+   face(top,paint);face([...outline].reverse().map(p=>P(p[0],p[1],bottom)),'#34475d');
+   for(let i=0;i<outline.length;i++){const a=outline[i],b=outline[(i+1)%outline.length];face([P(a[0],a[1],bottom),P(b[0],b[1],bottom),P(b[0],b[1],bottom+height),P(a[0],a[1],bottom+height)],'#a5b6c9');}
+  }
+  box(out,x,y,z,20,20,.65,{wall:'#6382a2',roof:'#829bb6'},{kind:'roof-macquette'});
+  for(const sy of[-6,7])box(out,x,y+sy,z+.65,2.2,3,3.8,{wall:'#879db4',roof:'#a7b8c9'},{kind:'roof-macquette'});
+  horizontalPrism([[-3,6],[-15,-10],[-5,-12],[5,-12],[15,-10],[3,6]],4.9,.65,'#eff4fa');
+  // A deliberately simplified display model: delta wings, fuselage and fin.
+  const sections=[[-13,3.3,2.45],[-5,4.05,3.1],[8,2.8,2.4],[15,.55,.55]],rings=sections.map(([sy,rx,rz])=>Array.from({length:8},(_,i)=>{const a=TAU*i/8;return P(Math.sin(a)*rx,sy,7+Math.cos(a)*rz);}));
+  for(let j=0;j<rings.length-1;j++)for(let i=0;i<8;i++){
+   const next=(i+1)%8,paint=j===2?'#34485e':Math.cos(TAU*(i+.5)/8)<-.35?'#354a62':'#f3f7fb';
+   face([rings[j][i],rings[j][next],rings[j+1][next]],paint);face([rings[j][i],rings[j+1][next],rings[j+1][i]],paint);
+  }
+  face([...rings[0]].reverse(),'#566d87');face(rings[rings.length-1],'#263b52');
+  const fin=[[-13,7],[-13,14],[-9,14],[-4,7]];
+  face([...fin].reverse().map(p=>P(.55,p[0],p[1])),'#edf3fb');face(fin.map(p=>P(-.55,p[0],p[1])),'#c4d2e3');
+  for(let i=0;i<fin.length;i++){const a=fin[i],b=fin[(i+1)%fin.length];face([P(-.55,a[0],a[1]),P(.55,a[0],a[1]),P(.55,b[0],b[1]),P(-.55,b[0],b[1])],'#344b64');}
+  face([P(-1.9,4.7,9.8),P(1.9,4.7,9.8),P(1.5,8,9.45),P(-1.5,8,9.45)],'#28435f');
+ }
  function tree(out,x,y,size){
   box(out,x,y,4,1.5,1.5,size*.65,{wall:'#738591',roof:'#a5b4b7'},{kind:'landscape'});
   const z=4+size*.45,s=size*.55,tip=P(x,y,z+size*.95);
@@ -68,6 +106,10 @@
    front.push(frontPatch(0,depth/2+.1,z+.45,width,1.2,'#c7d5e5'));
    right.push(sidePatch(width/2+.1,0,z+.45,depth,1.2,'#b9c9df'));
    box(out,0,0,z,width,depth,floor,{front:row%2?'#edf0ef':'#e6eaf0',side:'#d2dce7',roof:'#dbe5ee'},{front,right,top:row===4});
+   if(row>=3){
+    for(const col of[0,3,6,9])airConditioner(out,-width/2+10+col*(width-20)/9,depth/2+1.2,z+.8,false,1,row+1);
+    for(const wy of[-17,17])airConditioner(out,width/2+1.2,wy,z+.8,true,1,row+1);
+   }
   }
   // An enclosed entrance, roof parapet and rooftop service blocks.
   const top=base+floor*5;
@@ -98,11 +140,16 @@
    front.push(frontPatch(x,y+d/2+.1,z+floor-.5,width,.45,'#e6e0d2'));
    const dark=[0,6,12,17].includes(row);
    box(out,x,y,z,width,d,floor,{front:dark?'#7b7773':'#c9c6b9',side:dark?'#6b6c6c':'#b4b5ae',roof:'#e5e0d3'},{front,right});
+   if(row>=12){
+    for(const col of[0,count-1])airConditioner(out,x-width/2+6+col*(width-12)/(count-1),y+d/2+.62,z+.1,false,.46,row+1);
+    airConditioner(out,x+width/2+.62,y,z+.1,true,.46,row+1);
+   }
    // Thin terrace lips preserve the characteristic stepped silhouette.
    if(row<17&&row%2===0)box(out,x-width/2+.45,y,z+floor,1,Math.max(12,d-4),1.4,{wall:'#bdc3c5',roof:'#e2e6e3'});
   }
   const top=base+18*floor;
   box(out,7,-11,top,40,49,4,{wall:'#3b4658',roof:'#6c819b'});
+  rooftopShuttle(out,7,-11,top+4);
   // The lower side wing seen beside the main stepped building.
   for(let row=0;row<9;row++){
    const z=base+row*5.4,front=[],right=[];
@@ -194,7 +241,7 @@
   for(const face of faces){
    if(face.clipped){ctx.save();path(face.points);ctx.clip();}
    const illumination=.78+Math.max(0,dot(face.normal,light))*.24;
-   const nightPaint=blend(face.paint,[51,76,112],dark?.63:.31);
+   const nightPaint=blend(face.paint,[51,76,112],face.kind==='roof-macquette'?(dark?.32:.18):(dark?.63:.31));
    let fill=blend(face.paint,nightPaint,night);
    if(face.kind==='platform')fill=blend(fill,dark?[45,66,96]:[206,220,237],night*.65);
    if(face.kind==='lamp-glow')fill=blend(fill,[255,215,143],night);
