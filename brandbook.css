@@ -48,4 +48,140 @@ h1,h2,h3{font-weight:700}.eyebrow{font-weight:500;letter-spacing:.11em}
 @media(max-width:560px){.hero{padding-top:29px;padding-bottom:29px}.hero h1{font-size:32px;line-height:1.09;letter-spacing:-.025em}.hero .eyebrow{font-size:9px}.hero-facts>span{font-size:17px}.hero-facts b{font-size:40px}.hero-facts{gap:8px}.hero-description{font-size:12px}.hero-cards .curfew{padding:18px 20px;gap:6px 12px}.curfew-time{font-size:44px;block-size:1.2em}.hero-cards .curfew-top{font-size:11px}.hero-cards .curfew>p:not(.curfew-time){font-size:10px}.hero-cards .curfew>a,.hero-cards .quick-contacts-bottom{font-size:10px;min-height:34px}.quick-contact-names{font-size:16px;line-height:1.4;gap:8px 16px;margin-top:11px}.brand-pattern{width:120px;right:-25px;top:-16px;opacity:.16}.growth-scene-caption{font-size:9px}.xp-hub-heading h2{font-size:15px;max-width:210px;line-height:1.4}.xp-hub-heading .xp-source{font-size:10px;white-space:nowrap}.xp-house-top{font-size:11px}.xp-entry strong{font-size:18px}.xp-entry p{font-size:10px;line-height:1.7}.xp-entry-bottom{font-size:10px}.section-heading h2{font-size:25px}.search-box input{font-size:12px}.results-toolbar p,.results-toolbar button{font-size:10px}.rule>summary h3{font-size:12px;line-height:1.6}.rule>summary .number{font-size:20px;width:27px}.rule>summary{gap:12px;padding-top:21px;padding-bottom:21px}.rule-body{padding:17px}.sanction-header p,.compare-button{font-size:9px}.stage-tab{font-size:11px}.stage-panel{padding:17px}.stage-items li{font-size:12px}.compare-mode .stage-items li{font-size:11px}.card-footer,.card-footer button{font-size:8px}.faq>summary h3{font-size:12px;line-height:1.65}.faq-text{font-size:12px}.faq-number{width:27px;height:27px;font-size:12px}.main-advice p:last-child{font-size:12px}.xp-mode-panel h3{font-size:23px}.xp-lead{font-size:12px}.xp-choice{font-size:12px}.xp-btn{font-size:11px}.xp-result h3{font-size:25px}.xp-result>p{font-size:12px}.xp-study-card h3{font-size:22px}.xp-study-stage li{font-size:11px}.residence-card .residence-heading h3{font-size:24px}.site-footer p{font-size:10px}}
 @media(max-width:380px){.brand-art{width:160px}.hero h1{font-size:29px}.hero-facts b{font-size:36px}.hero-facts>span{font-size:16px}.growth-scene{min-width:125px}.xp-entry strong{font-size:17px}.xp-entry p{font-size:9.5px}.primary-nav a{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.brand-pattern,.growth-float{animation:none!important}.growth-cube{transition:none!important}}
+/* Screen typography: use the text face for reading, display faces for large
+   headings, and whole-pixel sizes for small labels. Keep text out of the
+   permanently transformed blue-card layer; the supporting artwork still moves. */
+@media screen {
+  body { font-size:16px; line-height:1.6; }
+  .primary-nav a, .print-button { font-size:14px; line-height:1.5; }
+  .hero .eyebrow { font-size:12px; letter-spacing:.09em; line-height:1.5; }
+  .hero h1 { font-weight:700; line-height:1.15; letter-spacing:-.015em; }
+  .hero-description { font-size:16px; line-height:1.7; }
+  .hero-cards [data-card-motion] {
+    transform:none;
+    transition:box-shadow .35s ease, background .2s ease;
+  }
+  .hero-cards .curfew-top, .quick-contacts-top { font-size:14px; line-height:1.5; }
+  .hero-cards .curfew > p:not(.curfew-time) {
+    font-size:14px; font-weight:500; line-height:1.65; color:#fff;
+  }
+  .quick-contact-names { font-size:22px; letter-spacing:0; line-height:1.35; }
+  .hero-cards .curfew > a, .hero-cards .quick-contacts-bottom {
+    font-size:12px; font-weight:500; line-height:1.55; min-height:54px;
+  }
+  .growth-scene-caption { font-size:12px; letter-spacing:0; }
+  .category-button { font-size:14px; line-height:1.5; }
+  .category-button .cat-count { font-size:12px; opacity:1; }
+  .sidebar-label { font-size:12px; }
+  .sidebar-note h2 {
+    font-family:"Alabuga Sans",Arial,sans-serif;
+    font-size:16px; font-weight:500; line-height:1.45; max-width:none;
+  }
+  .sidebar-note p { font-size:14px; line-height:1.7; }
+  .sidebar-note a, .advice-nav a { font-size:13px; line-height:1.6; }
+  .section-heading h2 { font-size:28px; font-weight:700; letter-spacing:-.015em; }
+  .section-heading .eyebrow { font-size:12px; }
+  .section-description { font-size:15px; }
+  .search-box input { font-size:16px; }
+  .results-toolbar { gap:12px; align-items:flex-start; }
+  .results-toolbar p, .results-toolbar button { font-size:13px; line-height:1.6; }
+  .results-toolbar p { flex:1; min-width:0; }
+  .results-toolbar button { flex:none; }
+  .mobile-filters button { font-size:13px; line-height:1.5; }
+  .group-heading { gap:12px; }
+  .group-heading h3 {
+    font-family:"Alabuga Sans",Arial,sans-serif;
+    font-size:16px; font-weight:500; line-height:1.5;
+  }
+  .group-heading > span { font-size:13px; line-height:1.5; }
+  .group-rule h3, .rule > summary h3, .faq > summary h3 {
+    font-family:"Alabuga Sans",Arial,sans-serif;
+    font-size:16px; font-weight:500; line-height:1.6; letter-spacing:0;
+  }
+  .number { font-size:22px; line-height:1.2; letter-spacing:-.015em; }
+  .group-sanction { flex-wrap:wrap; gap:14px 22px; }
+  .group-sanction-label, .group-sanction-label b { font-size:13px; font-weight:500; line-height:1.6; }
+  .group-sanction li { font-size:15px; font-weight:500; line-height:1.6; }
+  .sanction-header { flex-wrap:wrap; }
+  .sanction-header p { font-size:13px; line-height:1.6; }
+  .compare-button { font-size:12px; line-height:1.6; }
+  .stage-tab { font-size:14px; line-height:1.5; padding:10px 14px 12px; }
+  .stage-items li { font-size:15px; line-height:1.65; }
+  .compare-mode .stage-items li { font-size:14px; }
+  .stage-panel > h4 { font-size:13px; line-height:1.5; }
+  .card-footer, .card-footer button { font-size:12px; line-height:1.5; }
+  .faq-text { font-size:16px; line-height:1.75; }
+  .faq-number { font-size:14px; }
+  .faq[open]:not(.is-closing) .faq-number { transform:none; }
+  .main-advice .eyebrow { font-size:12px; }
+  .main-advice p:last-child { font-size:16px; line-height:1.75; }
+  .xp-hub-heading h2 { font-size:19px; line-height:1.45; letter-spacing:-.01em; }
+  .xp-entry strong { font-size:20px; font-weight:700; letter-spacing:-.01em; }
+  .xp-entry p { font-size:14px; line-height:1.7; }
+  .xp-entry-bottom { font-size:12px; line-height:1.5; }
+  .xp-house-top { font-size:13px; line-height:1.5; }
+  .xp-live { font-size:11px; }
+  .xp-house-zones button { font-size:12px; line-height:1.5; }
+  .xp-dialog-header h2 { font-size:24px; font-weight:700; letter-spacing:-.01em; }
+  .xp-dialog-kicker, .xp-result-kicker { font-size:12px; }
+  .xp-mode-meta { font-size:13px; }
+  .xp-mode-panel h3 { font-weight:700; letter-spacing:-.01em; }
+  .xp-lead, .xp-choice, .xp-answer { font-size:16px; line-height:1.7; }
+  .xp-choice-letter { font-size:13px; }
+  .xp-btn, .xp-source { font-size:14px; line-height:1.6; }
+  .xp-result > p { font-size:15px; line-height:1.7; }
+  .xp-result-bottom > span { font-size:12px; line-height:1.6; }
+  .xp-study-count, .xp-study-filter, .xp-study-caption { font-size:13px; }
+  .xp-study-stage > h4 { font-size:13px; }
+  .xp-study-stage li { font-size:15px; line-height:1.65; }
+  .xp-study-bottom > span, .xp-study-jump > summary, .xp-known-tag { font-size:12px; }
+  .xp-study-index button, .xp-status { font-size:13px; }
+  .residence-card .contact-links a { font-size:15px; line-height:1.6; }
+  .residence-badge, .residence-model-hint { font-size:12px; }
+  .site-footer, .site-footer p { font-size:13px; line-height:1.6; }
+  .site-footer > span { font-size:15px; }
+  .site-footer a { font-size:14px; }
+  .xp-dialog[open], .search-reveal, .residence-card.is-visible .contact-links {
+    animation-fill-mode:backwards;
+  }
+}
+@media screen and (max-width:800px) {
+  .primary-nav { gap:16px; }
+  .primary-nav a { font-size:13px; }
+  .hero-cards .curfew-top, .quick-contacts-top { font-size:14px; }
+  .xp-hub-heading .xp-source { font-size:12px; line-height:1.5; }
+  .xp-entry strong { font-size:19px; }
+  .xp-entry p { font-size:14px; }
+  .residence-badge { font-size:11px; }
+  .residence-card .residence-heading { flex-wrap:wrap; gap:7px; }
+}
+@media screen and (max-width:560px) {
+  .hero h1 { font-size:32px; line-height:1.16; letter-spacing:-.015em; }
+  .hero .eyebrow { font-size:11px; letter-spacing:.08em; }
+  .hero-description { font-size:15px; }
+  .hero-cards .curfew { display:flex; flex-direction:column; align-items:stretch; }
+  .hero-cards .curfew > p:not(.curfew-time) { margin-top:8px; }
+  .quick-contact-names { font-size:21px; }
+  .hero-cards .curfew > a, .hero-cards .quick-contacts-bottom { min-height:44px; }
+  .growth-scene-caption { font-size:11px; }
+  .section-heading h2 { font-size:25px; }
+  .group-heading { align-items:flex-start; }
+  .group-heading > span { text-align:left; }
+  .rule > summary h3, .group-rule h3, .faq > summary h3 { font-size:16px; }
+  .rule > summary .number { font-size:21px; }
+  .group-sanction-label { display:block; }
+  .group-sanction-label b { margin-top:3px; }
+  .stage-tab { padding-left:8px; padding-right:8px; }
+  .faq-text, .main-advice p:last-child { font-size:16px; }
+  .xp-hub-heading h2 { font-size:18px; max-width:230px; }
+  .xp-entry { padding:17px 15px; }
+  .xp-entry strong { font-size:18px; }
+  .xp-entry p { font-size:14px; }
+  .xp-entry-bottom { font-size:12px; }
+  .xp-dialog-header h2 { font-size:22px; }
+  .xp-mode-panel h3 { font-size:23px; }
+  .xp-lead, .xp-choice, .xp-answer { font-size:16px; }
+  .xp-btn { font-size:14px; }
+  .xp-study-card h3 { font-size:22px; }
+}
 @media print{html,[data-theme=dark]{--blue:#0c6ff1;--deep:#000d3c;--ink:#161616;--muted:#4e596d;--line:#cccfd8;--paper:white;--xp-surface:white}.brand-art{width:180px}.brand-wordmark,[data-theme=dark] .brand-wordmark{fill:#1b1b1b}.hero h1{font-size:24pt}.hero-description{font-size:10pt}.rule>summary h3,.group-rule h3{font-size:9pt}.stage-items li{font-size:8pt}.faq-text{font-size:9pt}}
