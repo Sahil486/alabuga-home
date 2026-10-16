@@ -118,6 +118,62 @@
   const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
   return{eye:[sy*cp,cy*cp,sp],project:p=>[p[0]*cy-p[1]*sy,(p[0]*sy+p[1]*cy)*sp-p[2]*cp],depth:p=>(p[0]*sy+p[1]*cy)*cp+p[2]*sp};
  }
+ // Partition intersecting polygons once, then paint from back to front for
+ // the current eye position. Centroid sorting cannot resolve a large wall
+ // against a small step or tree, even though both meshes are valid.
+ const PLANE_EPSILON=.00001;
+ const dot3=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+ function polygonPlane(points){
+  const a=points[0],u=points[1].map((v,i)=>v-a[i]);
+  for(let j=2;j<points.length;j++){
+   const v=points[j].map((n,i)=>n-a[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],length=Math.hypot(...n);
+   if(length>PLANE_EPSILON){const normal=n.map(x=>x/length);return{normal,w:dot3(normal,a)};}
+  }
+  return null;
+ }
+ function classifyPolygon(face,plane){
+  let type=0;
+  for(const p of face.points){const d=dot3(plane.normal,p)-plane.w;type|=d>PLANE_EPSILON?1:d<-PLANE_EPSILON?2:0;}
+  return type;
+ }
+ function splitPolygon(face,plane,front,back){
+  const distances=face.points.map(p=>dot3(plane.normal,p)-plane.w),types=distances.map(d=>d>PLANE_EPSILON?1:d<-PLANE_EPSILON?2:0),f=[],b=[];
+  for(let i=0;i<face.points.length;i++){
+   const j=(i+1)%face.points.length,p=face.points[i],q=face.points[j],type=types[i];
+   if(type!==2)f.push(p);if(type!==1)b.push(p);
+   if((type|types[j])===3){const t=distances[i]/(distances[i]-distances[j]),intersection=p.map((v,k)=>mix(v,q[k],t));f.push(intersection);b.push(intersection);}
+  }
+  for(const [points,target] of[[f,front],[b,back]])if(points.length>=3&&polygonPlane(points))target.push({...face,points,clipped:true});
+ }
+ function choosePartition(faces){
+  let best=faces[0].plane,score=Infinity;
+  const stride=Math.max(1,Math.floor(faces.length/22));
+  for(let i=0;i<faces.length;i+=stride){
+   const plane=faces[i].plane;let front=0,back=0,splits=0;
+   for(const face of faces){const type=classifyPolygon(face,plane);if(type===1)front++;else if(type===2)back++;else if(type===3)splits++;}
+   const cost=splits*5+Math.abs(front-back)*.45;
+   if(cost<score){score=cost;best=plane;}if(cost===0)break;
+  }
+  return best;
+ }
+ function buildPartition(faces){
+  if(!faces.length)return null;
+  const plane=choosePartition(faces),coplanar=[],front=[],back=[];
+  for(const face of faces){const type=classifyPolygon(face,plane);if(type===0)coplanar.push(face);else if(type===1)front.push(face);else if(type===2)back.push(face);else splitPolygon(face,plane,front,back);}
+  return{plane,faces:coplanar,front:buildPartition(front),back:buildPartition(back)};
+ }
+ function orderedFaces(model,eye){
+  if(!model.partition)model.partition=buildPartition(model.faces.map((face,sourceIndex)=>({...face,sourceIndex,outline:face.points,plane:polygonPlane(face.points)})).filter(face=>face.plane));
+  const result=[],viewpoint=eye.map(v=>v*100000);
+  function visit(node){
+   if(!node)return;
+   const front=dot3(node.plane.normal,viewpoint)>=node.plane.w;
+   visit(front?node.back:node.front);
+   for(const face of node.faces)if(dot3(face.normal,eye)>.001)result.push(face);
+   visit(front?node.front:node.back);
+  }
+  visit(model.partition);return result;
+ }
  function paintModel(ctx,model,view){
   const {width,height,yaw,pitch,night,dark,accent}=view;
   const cam=camera(yaw,pitch),dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
@@ -134,15 +190,16 @@
   ctx.save();ctx.translate(ground[0]+5,ground[1]+7);ctx.scale(1,.35);const shadow=ctx.createRadialGradient(0,0,8,0,0,model.platformWidth*scale*.55);shadow.addColorStop(0,dark?'rgba(0,0,0,.42)':'rgba(40,67,105,.21)');shadow.addColorStop(1,'rgba(20,40,65,0)');ctx.fillStyle=shadow;ctx.beginPath();ctx.arc(0,0,model.platformWidth*scale*.55,0,TAU);ctx.fill();ctx.restore();
   if(night>.02){ctx.save();ctx.globalAlpha=night*.16;ctx.translate(ground[0],ground[1]+1);ctx.scale(1,.32);const glow=ctx.createRadialGradient(0,0,3,0,0,model.platformWidth*scale*.57);glow.addColorStop(0,color(accent));glow.addColorStop(1,'rgba(40,120,230,0)');ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,model.platformWidth*scale*.57,0,TAU);ctx.fill();ctx.restore();}
   const light=[-.25+view.pointerX*.1,.55,.8];
-  const faces=model.faces.filter(face=>dot(face.normal,cam.eye)>.001).sort((a,b)=>cam.depth(a.center)-cam.depth(b.center));
+  const faces=orderedFaces(model,cam.eye);
   for(const face of faces){
+   if(face.clipped){ctx.save();path(face.points);ctx.clip();}
    const illumination=.78+Math.max(0,dot(face.normal,light))*.24;
    const nightPaint=blend(face.paint,[51,76,112],dark?.63:.31);
    let fill=blend(face.paint,nightPaint,night);
    if(face.kind==='platform')fill=blend(fill,dark?[45,66,96]:[206,220,237],night*.65);
    if(face.kind==='lamp-glow')fill=blend(fill,[255,215,143],night);
    path(face.points);ctx.fillStyle=color(fill,illumination);ctx.fill();
-   ctx.strokeStyle=dark?'rgba(130,168,211,.075)':'rgba(43,68,103,.08)';ctx.lineWidth=.45;ctx.stroke();
+   path(face.outline||face.points);ctx.strokeStyle=dark?'rgba(130,168,211,.075)':'rgba(43,68,103,.08)';ctx.lineWidth=.45;ctx.stroke();
    for(const detail of face.details){
     let tone=detail.paint;
     if(detail.type==='window'||detail.type==='glass'){
@@ -158,10 +215,11 @@
      const p=project(detail.points[0]);ctx.beginPath();ctx.moveTo(p[0]+5,p[1]+12);ctx.lineTo(p[0]+85,p[1]-38);ctx.moveTo(p[0]+42,p[1]+12);ctx.lineTo(p[0]+122,p[1]-38);ctx.stroke();ctx.restore();
     }
    }
+   if(face.clipped)ctx.restore();
   }
  }
  // Reuse exactly the same geometry and renderer for static visual checks.
- if(typeof document==='undefined'){if(typeof module!=='undefined')module.exports={dorm,pyramid,paintModel,rgb,camera};return;}
+ if(typeof document==='undefined'){if(typeof module!=='undefined')module.exports={dorm,pyramid,paintModel,rgb,camera,orderedFaces};return;}
  const cards=[...document.querySelectorAll('.residence-card')];if(!cards.length)return;
  const reduced=matchMedia('(prefers-reduced-motion:reduce)'),fine=matchMedia('(hover:hover) and (pointer:fine)');
  const names={kallisto:'Каллисто',ganimed:'Ганимед',piramida:'Пирамида'};
