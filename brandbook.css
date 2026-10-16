@@ -16,12 +16,12 @@ h1,h2,h3{font-weight:700}.eyebrow{font-weight:500;letter-spacing:.11em}
 .brand{padding:0}.brand-art{display:block;width:196px;height:auto;pointer-events:none;overflow:visible}.brand-wordmark{fill:#1b1b1b}
 /* One short assembly, then a single travelling wave on hover or keyboard focus.
    No fill-forwards transform or continuous animation on the logo text. */
-.brand-symbol > path:nth-child(1){--brand-x:0px;--brand-y:-7px;--brand-delay:140ms;--brand-order:2}
-.brand-symbol > path:nth-child(2){--brand-x:7px;--brand-y:-4px;--brand-delay:110ms;--brand-order:3}
-.brand-symbol > path:nth-child(3){--brand-x:10px;--brand-y:4px;--brand-delay:0ms;--brand-order:4}
-.brand-symbol > path:nth-child(4){--brand-x:-7px;--brand-y:-4px;--brand-delay:110ms;--brand-order:1}
-.brand-symbol > path:nth-child(5){--brand-x:0px;--brand-y:9px;--brand-delay:280ms;--brand-order:5}
-.brand-symbol > path:nth-child(6){--brand-x:-10px;--brand-y:4px;--brand-delay:0ms;--brand-order:0}
+.brand-segment:nth-child(1){--brand-x:0px;--brand-y:-7px;--brand-delay:140ms;--brand-order:2}
+.brand-segment:nth-child(2){--brand-x:7px;--brand-y:-4px;--brand-delay:110ms;--brand-order:3}
+.brand-segment:nth-child(3){--brand-x:10px;--brand-y:4px;--brand-delay:0ms;--brand-order:4}
+.brand-segment:nth-child(4){--brand-x:-7px;--brand-y:-4px;--brand-delay:110ms;--brand-order:1}
+.brand-segment:nth-child(5){--brand-x:0px;--brand-y:9px;--brand-delay:280ms;--brand-order:5}
+.brand-segment:nth-child(6){--brand-x:-10px;--brand-y:4px;--brand-delay:0ms;--brand-order:0}
 @keyframes brand-segment-arrive {
   from{opacity:0;transform:translate(var(--brand-x),var(--brand-y))}
   to{opacity:1;transform:none}
@@ -32,10 +32,10 @@ h1,h2,h3{font-weight:700}.eyebrow{font-weight:500;letter-spacing:.11em}
   64%{opacity:1;transform:none}
 }
 @media screen and (prefers-reduced-motion:no-preference) {
-  .brand-symbol > path {
+  .brand-segment {
     animation:brand-segment-arrive 760ms cubic-bezier(.22,1,.36,1) calc(80ms + var(--brand-delay)) 1 backwards;
   }
-  .brand:is(:hover,:focus-visible) .brand-symbol > path {
+  .brand:is(:hover,:focus-visible) .brand-segment > path {
     animation:brand-segment-wave 1050ms cubic-bezier(.22,1,.36,1) calc(var(--brand-order) * 65ms) 1 backwards;
   }
 }
