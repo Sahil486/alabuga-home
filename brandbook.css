@@ -108,8 +108,8 @@ h1,h2,h3{font-weight:700}.eyebrow{font-weight:500;letter-spacing:.11em}
 @media(max-width:380px){.brand-art{width:160px}.hero h1{font-size:29px}.hero-facts b{font-size:36px}.hero-facts>span{font-size:16px}.growth-scene{min-width:125px}.xp-entry strong{font-size:17px}.xp-entry p{font-size:9.5px}.primary-nav a{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.brand-pattern,.growth-float{animation:none!important}.growth-cube{transition:none!important}}
 /* Screen typography: use the text face for reading, display faces for large
-   headings, and whole-pixel sizes for small labels. Keep text out of the
-   permanently transformed blue-card layer; the supporting artwork still moves. */
+   headings, and whole-pixel sizes for small labels. Blue cards have no
+   permanent transform; pointer tilt is enabled only during mouse interaction. */
 @media screen {
   body { font-size:16px; line-height:1.6; }
   .primary-nav a, .print-button { font-size:14px; line-height:1.5; }
@@ -122,7 +122,7 @@ h1,h2,h3{font-weight:700}.eyebrow{font-weight:500;letter-spacing:.11em}
   .hero-description { font-size:16px; line-height:1.7; }
   .hero-cards [data-card-motion] {
     transform:none;
-    transition:box-shadow .35s ease, background .2s ease;
+    transition:transform .3s cubic-bezier(.22,1,.36,1), box-shadow .35s ease, background .2s ease;
   }
   .hero-cards .curfew-top, .quick-contacts-top { font-size:14px; line-height:1.5; }
   .hero-cards .curfew > p:not(.curfew-time) {
@@ -210,6 +210,12 @@ h1,h2,h3{font-weight:700}.eyebrow{font-weight:500;letter-spacing:.11em}
   .site-footer a { font-size:14px; }
   .xp-dialog[open], .search-reveal, .residence-card.is-visible .contact-links {
     animation-fill-mode:backwards;
+  }
+}
+/* Keep the resting text sharp, and restore depth while following the pointer. */
+@media screen and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) {
+  .hero-cards [data-card-motion].is-pointed {
+    transform:perspective(900px) rotateX(var(--card-rx,0deg)) rotateY(var(--card-ry,0deg)) translateY(-3px);
   }
 }
 @media screen and (max-width:800px) {
