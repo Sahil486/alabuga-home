@@ -86,52 +86,87 @@
    out.push(surface(quad(q.a,q.e,13.1,q.b,q.e,13.1,q.b,q.e,13.7,q.a,q.e,13.7),P(0,1,0),'#f1d7a0',[],'lamp-glow'));
   }
  }
- function dorm(){
+ // Stylized rendition of the "Мост до Луны" end wall in the Callisto photos.
+ // Everything is drawn in the same plane as the facade, so it rotates with the mesh.
+ function moonMural(x,base,height){
+  const out=[],start=-3,width=32;
+  const poly=(p,c)=>out.push(patch(p.map(([u,v])=>P(x,start+u*width,base+v*height)),c));
+  const rect=(u,v,w,h,c)=>poly([[u,v],[u+w,v],[u+w,v+h],[u,v+h]],c);
+  const oval=(u,v,w,h,c)=>poly(Array.from({length:18},(_,i)=>{const a=TAU*i/18;return[u+Math.cos(a)*w,v+Math.sin(a)*h];}),c);
+  rect(0,0,1,1,'#092a55');
+  poly([[0,0],[1,0],[1,.42],[.68,.34],[.4,.23],[.18,.08]],'#166fa8');
+  poly([[0,0],[1,0],[1,.22],[.7,.17],[.52,.09],[.39,0]],'#2da9de');
+  poly([[.08,1],[.16,.91],[.31,.83],[.53,.78],[.77,.77],[1,.80],[1,1]],'#64c5ec');
+  poly([[.18,1],[.23,.94],[.35,.87],[.55,.81],[.78,.79],[1,.82],[1,1]],'#372d46');
+  poly([[.24,1],[.38,.91],[.56,.84],[.81,.81],[1,.84],[1,1]],'#1b2039');
+  for(let i=0;i<28;i++){const u=.04+hash(i,9)*.91,v=.34+hash(i,23)*.61,s=i%7===0?.026:.009;poly([[u-s,v],[u,v+s*.6],[u+s,v],[u,v-s*.6]],i%5===0?'#a8d9ef':'#e3f4fb');}
+  poly([[.33,.11],[.37,.11],[.96,.78],[.93,.79]],'#cb9268');
+  poly([[.39,.1],[.41,.1],[.99,.76],[.98,.77]],'#5faad4');
+  // Small astronaut and capsule silhouettes are readable even on mobile.
+  poly([[.35,.51],[.43,.50],[.48,.44],[.44,.39],[.38,.42],[.35,.37],[.29,.39],[.31,.46],[.26,.49],[.19,.47],[.17,.50],[.25,.55]],'#b6dded');
+  poly([[.38,.50],[.49,.51],[.55,.47],[.51,.44],[.45,.47]],'#e9f5f7');
+  poly([[.35,.52],[.42,.50],[.41,.45],[.34,.45],[.3,.48]],'#f1f7f8');
+  oval(.34,.565,.089,.047,'#f0f6f5');oval(.326,.571,.064,.032,'#183b5b');oval(.304,.58,.027,.008,'#6794b0');
+  poly([[.65,.18],[.79,.17],[.88,.22],[.84,.33],[.77,.36],[.70,.31]],'#d4e7ed');
+  poly([[.69,.25],[.86,.23],[.87,.26],[.71,.28]],'#b8654d');
+  poly([[.76,.34],[.85,.31],[.82,.35],[.79,.37]],'#3f81a9');
+  return out;
+ }
+ function dorm(key='kallisto'){
   const out=[];grounds(out,false);
-  const w=171,d=53,h=14.7,base=4,top=base+5*h;
-  const cream='#e8dcc0',brown='#634c43',trim='#59483f',white='#f5eee0',glass='#496377';
-  const cores=[-52,31];
+  const kallisto=key==='kallisto',coreX=kallisto?-73:63,endWindows=[];
+  const w=178,d=58,h=13.15,base=4,top=base+5*h;
+  const light='#e1e6e5',lower='#383e37',frame='#f3f5f3',glass='#627e90';
   for(let row=0;row<5;row++){
    const z=base+row*h,front=[],back=[],right=[],left=[];
+   const lightFloor=row>=3;
    for(const [sign,face] of [[1,front],[-1,back]]){
-    const y=sign*(d/2+.05);
-    if(row)face.push(frontPatch(0,y,z+.2,w,4.2,brown));
-    for(let col=0;col<13;col++){
-     const x=-76+col*12.65;
-     if(cores.some(core=>Math.abs(x-core)<7))continue;
-     face.push(frontPatch(x,y+sign*.02,z+5,8.9,7.5,white));
-     face.push(frontPatch(x,y+sign*.04,z+5.6,7.6,6.35,glass,'window',row*43+col+(sign<0?180:0)));
-     face.push(frontPatch(x,y+sign*.06,z+5.6,.65,6.35,white,'mullion'));
-     if(row>=3&&sign>0&&col%4===1)airConditioner(out,x+3.7,d/2+1.2,z+4.4,false,.62,row+1);
+    const y=sign*(d/2+.055);
+    face.push(frontPatch(0,y,z+.35,w-.3,.20,lightFloor?'#b7c3c5':'#292e2b'));
+    for(let col=0;col<16;col++){
+     const x=-81+col*10.75;
+     if(sign===1&&Math.abs(x-coreX)<10)continue;
+     face.push(frontPatch(x,y+sign*.02,z+3.2,8,7.65,frame));
+     face.push(frontPatch(x,y+sign*.04,z+3.75,6.85,6.5,glass,'window',row*43+col+(sign<0?180:0)));
+     face.push(frontPatch(x+.7,y+sign*.06,z+3.75,.50,6.5,frame,'mullion'));
+     if(lightFloor&&sign>0&&col%2===1)airConditioner(out,x+2.35,d/2+.87,z+1.2,false,.66,row+1);
     }
    }
    for(const [sign,face] of [[1,right],[-1,left]]){
-    const x=sign*(w/2+.05);
-    for(const y of [-4,5]){
-     face.push(sidePatch(x,y,z+5,5.2,7.3,white));
-     face.push(sidePatch(x+sign*.02,y,z+5.6,4,6,glass,'window',row*7+y+80));
+    const x=sign*(w/2+.055);
+    const details=kallisto&&sign===1?endWindows:face;
+    for(const y of sign===1&&kallisto?[-12]:[-16,-5,10]){
+     details.push(sidePatch(x,y,z+3.2,6.3,7.65,frame));
+     details.push(sidePatch(x+sign*.02,y,z+3.75,5.15,6.5,glass,'window',row*31+y+110));
+     details.push(sidePatch(x+sign*.04,y+.65,z+3.75,.43,6.5,frame,'mullion'));
     }
    }
-   box(out,0,0,z,w,d,h,{front:row?cream:brown,side:row?cream:brown,back:row?cream:brown,left:row?cream:brown,roof:'#aaa298'},{front,back,right,left,top:row===4});
+   box(out,0,0,z,w,d,h,{front:lightFloor?light:lower,back:lightFloor?light:lower,side:kallisto?light:lightFloor?light:lower,left:lightFloor?light:lower,roof:'#a7aeb0'},{front,back,right,left,top:row===4});
   }
-  // Stairwell strips extend above the roofline, as on the reference facades.
-  for(const x of cores){
-   const y=d/2+1.5,front=[];
-   for(let row=0;row<5;row++){
-    const z=base+row*h;
-    front.push(frontPatch(x,y+1.55,z+4,4.5,9.5,white),frontPatch(x,y+1.58,z+4.6,3.25,8.3,glass,'window',row*23+x));
+  if(kallisto)out.push(surface(quad(w/2+.045,d/2,base,w/2+.045,-d/2,base,w/2+.045,-d/2,top,w/2+.045,d/2,top),P(1,0,0),light,[...moonMural(w/2+.061,base,top-base),...endWindows]));
+  // Brick stair tower and recessed-looking entrance on the long facade.
+  const x=coreX,y=d/2+1.9,front=[];
+  for(let row=0;row<5;row++){
+   const z=base+row*h;
+   for(const dx of [-3.1,3.1]){
+    front.push(frontPatch(x+dx,y+2.36,z+1,3.7,11.3,frame));
+    front.push(frontPatch(x+dx,y+2.38,z+1.55,2.7,10.25,glass,'window',row*17+dx));
    }
-   box(out,x,y,base,12,3,top-base+5,{wall:brown,roof:trim},{front});
-   box(out,x,d/2+4,base,14,7,7,{wall:trim,roof:'#837568'},{front:[frontPatch(x,d/2+7.55,base+.4,6.5,5.7,'#647987','door')]});
   }
-  box(out,0,0,top,173,54.5,1.65,{wall:trim,roof:'#aaa49c'});
+  const brick=kallisto?'#91694f':'#8a6756';
+  box(out,x,y,base,15,4.7,top-base+5.5,{wall:brick,side:'#795844',roof:'#8a827b'},{front});
+  const ey=d/2+5.2;
+  box(out,x,ey,base,17,9,7.8,{wall:'#b8c3c5',front:'#647c87',roof:'#d8dfe0'},{front:[frontPatch(x,ey+4.55,base+.15,8,6.8,'#3e5869','door'),frontPatch(x,ey+4.57,base+.15,.5,6.8,frame)]});
+  box(out,x,ey+.4,base+7.7,19,10,.75,{wall:'#e0e7e8',roof:'#eef2f1'});
+  box(out,0,0,top,179,59,1.45,{wall:'#aab3b4',roof:'#a3aaad'});
   for(const sign of [-1,1]){
-   box(out,0,sign*26.4,top+3.2,170,.48,.42,{wall:'#696b68',roof:'#9b9a92'});
-   box(out,sign*84.5,0,top+3.2,.48,52,.42,{wall:'#696b68',roof:'#9b9a92'});
-   for(const x of [-84,-63,-42,-21,0,21,42,63,84])box(out,x,sign*26.4,top+1.65,.46,.46,1.8,{wall:'#747773'});
+   box(out,0,sign*28.7,top+3.35,177,.45,.37,{wall:'#56616a',roof:'#7f8a90'});
+   box(out,sign*88.4,0,top+3.35,.45,57,.37,{wall:'#56616a',roof:'#7f8a90'});
+   for(const t of [-88,-66,-44,-22,0,22,44,66,88])box(out,t,sign*28.7,top+1.45,.41,.41,2,{wall:'#606a70'});
+   for(const t of [-14,0,14])box(out,sign*88.4,t,top+1.45,.41,.41,2,{wall:'#606a70'});
   }
-  for(const x of [-29,49])box(out,x,-8,top+1.65,7,6,2.8,{wall:'#796d61',roof:'#bab3a6'});
-  return{faces:out,yaw:.55,platformWidth:216,pyramid:false};
+  for(const rx of [-26,36])box(out,rx,-8,top+1.45,7,6,2.2,{wall:'#8d9699',roof:'#c3c9c9'});
+  return{faces:out,yaw:kallisto?.73:-.48,platformWidth:216,pyramid:false};
  }
  function pyramid(){
   const out=[];grounds(out,true);
@@ -289,7 +324,7 @@
  for(const card of cards){
   const button=card.querySelector('.residence-model'),canvas=card.querySelector('canvas'),ctx=canvas.getContext('2d');
   if(!ctx){button.hidden=true;continue;}
-  const key=card.dataset.residence,model=key==='piramida'?pyramid():dorm();if(key==='ganimed')model.yaw=.7;
+  const key=card.dataset.residence,model=key==='piramida'?pyramid():dorm(key);
   const viewButton=card.querySelector('[data-residence-view]');let rear=false;
   const accent=rgb(key==='ganimed'?'#36aee1':key==='piramida'?'#8680ef':'#448eef');
   let width=0,height=0,dpr=1,visible=false,frame=0,previous=0,px=0,py=0,tx=0,ty=0,night=0,targetNight=0,manual=null,themeDark=false,kick=0;
