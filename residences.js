@@ -112,9 +112,24 @@
   poly([[.76,.34],[.85,.31],[.82,.35],[.79,.37]],'#3f81a9');
   return out;
  }
+ function dormEntrance(out,x,facadeY,base){
+  const y=facadeY+4.5,z=base+.24,front=[];
+  const fy=y+4.54;
+  front.push(frontPatch(x,fy,z,16.25,7.05,'#d2dcdd'));
+  for(const [dx,width] of [[-6.1,3.55],[-2.05,3.7],[2.05,3.7],[6.1,3.55]]){
+   const door=Math.abs(dx)<3;
+   front.push(frontPatch(x+dx,fy+.02,z+(door?.22:.75),width,5.5,door?'#719aaa':'#526f82','door'));
+   front.push(frontPatch(x+dx,fy+.04,z+4.94,width-.25,.27,'#b0d4de'));
+   if(door)front.push(frontPatch(x+dx*.24,fy+.05,z+2.45,.27,1.5,'#eef5f3'));
+  }
+  front.push(frontPatch(x,fy+.03,z+6,15.5,.7,'#819eaa','door'));
+  box(out,x,y,base,17,9,7.8,{wall:'#a5b6ba',front:'#344950',roof:'#d8dfe0'},{front,kind:'entrance'});
+  box(out,x,y+.25,base+7.8,19,10,.7,{wall:'#c3cfd2',roof:'#e2e9e9'});
+  box(out,x,y+4.9,base,18.2,2.2,.3,{wall:'#8e999d',roof:'#c8d0d2'});
+ }
  function dorm(key='kallisto'){
   const out=[];grounds(out,false);
-  const kallisto=key==='kallisto',coreX=kallisto?-73:63,endWindows=[];
+  const kallisto=key==='kallisto',coreX=kallisto?-73:63,entrances=[coreX,kallisto?60:-60],endWindows=[];
   const w=178,d=58,h=13.15,base=4,top=base+5*h;
   const light='#e1e6e5',lower='#383e37',frame='#f3f5f3',glass='#627e90';
   for(let row=0;row<5;row++){
@@ -125,7 +140,7 @@
     face.push(frontPatch(0,y,z+.35,w-.3,.20,lightFloor?'#b7c3c5':'#292e2b'));
     for(let col=0;col<16;col++){
      const x=-81+col*10.75;
-     if(sign===1&&Math.abs(x-coreX)<10)continue;
+     if(sign===1&&(Math.abs(x-coreX)<10||(row===0&&entrances.some(e=>Math.abs(x-e)<12))))continue;
      face.push(frontPatch(x,y+sign*.02,z+3.2,8,7.65,frame));
      face.push(frontPatch(x,y+sign*.04,z+3.75,6.85,6.5,glass,'window',row*43+col+(sign<0?180:0)));
      face.push(frontPatch(x+.7,y+sign*.06,z+3.75,.50,6.5,frame,'mullion'));
@@ -155,9 +170,7 @@
   }
   const brick=kallisto?'#91694f':'#8a6756';
   box(out,x,y,base,15,4.7,top-base+5.5,{wall:brick,side:'#795844',roof:'#8a827b'},{front});
-  const ey=d/2+5.2;
-  box(out,x,ey,base,17,9,7.8,{wall:'#b8c3c5',front:'#647c87',roof:'#d8dfe0'},{front:[frontPatch(x,ey+4.55,base+.15,8,6.8,'#3e5869','door'),frontPatch(x,ey+4.57,base+.15,.5,6.8,frame)]});
-  box(out,x,ey+.4,base+7.7,19,10,.75,{wall:'#e0e7e8',roof:'#eef2f1'});
+  for(const entryX of entrances)dormEntrance(out,entryX,d/2,base);
   box(out,0,0,top,179,59,1.45,{wall:'#aab3b4',roof:'#a3aaad'});
   for(const sign of [-1,1]){
    box(out,0,sign*28.7,top+3.35,177,.45,.37,{wall:'#56616a',roof:'#7f8a90'});
