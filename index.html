@@ -13,7 +13,7 @@
   if(Object.prototype.hasOwnProperty.call(sections,key))return sections[key];
   const match=/^(rule|faq)-(\d+)$/.exec(String(key));
   const number=match?Number(match[2]):0;
-  if(!match||number<1||number>(match[1]==='rule'?27:7))return null;
+  if(!match||number<1||number>(match[1]==='rule'?27:6))return null;
   return '/'+(match[1]==='rule'?'rules':'advice')+'/'+number+'/';
  }
  function keyFromPath(path){
@@ -27,6 +27,7 @@
  }
  function current(){
   const legacy=location.hash.slice(1);
+  if(legacy==='faq-7'||/^\/advice\/7\/?$/.test(location.pathname))return 'advice';
   return (pathFor(legacy)?legacy:null)||keyFromPath(location.pathname)||'rules';
  }
  function notify(){window.dispatchEvent(new CustomEvent('hostel:route',{detail:{key:current()}}));}
@@ -41,7 +42,8 @@
  }
  function normalizeLegacy(){
   const key=location.hash.slice(1);
-  if(pathFor(key))go(key,{replace:true,notify:false});
+  if(key==='faq-7'||/^\/advice\/7\/?$/.test(location.pathname))go('advice',{replace:true,notify:false});
+  else if(pathFor(key))go(key,{replace:true,notify:false});
  }
  window.HostelRoutes=Object.freeze({current,url:pathFor,go});
  normalizeLegacy();
@@ -324,10 +326,20 @@
 @media screen and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){.faq:hover{transform:translateY(-2px)}}
 </style>
   <link rel="stylesheet" href="/experience.css?v=20261016-brand">
-  <link rel="stylesheet" href="/residences.css?v=20261016-brand">
+  
   <link rel="preload" href="/alabuga-sans-medium.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/brandbook.css?v=20261016-card-tilt">
-  </head>
+  <style id="residence-contact-style">
+.residence-card .residence-heading{display:flex;align-items:center;gap:14px;margin:0 0 16px}
+.residence-card .residence-heading h3{margin:0}
+.residence-contact-kicker{margin:0 0 3px;font-size:11px;font-weight:700;color:var(--muted)}
+.residence-contact-icon{display:grid;place-items:center;flex:0 0 44px;height:44px;border-radius:12px;background:#deeefd;color:#0c6ff1}
+.residence-contact-icon svg{width:24px;height:24px}
+.residence-card .contact-links{border-top:1px solid var(--residence-line,var(--line));padding-top:10px}
+[data-theme=dark] .residence-contact-icon{background:#15376a;color:#69cff7}
+@media print{.residence-contact-icon{display:none}.residence-card .residence-heading{margin-bottom:5px}}
+</style>
+</head>
 <body id="top">
   <div class="page-intro" id="page-intro" aria-hidden="true"><div class="intro-mark"><svg class="intro-symbol" viewBox="318 161 38 36" fill="none" focusable="false"><g class="intro-piece"><path d="M342.355 170.7C340.495 171.871 338.713 173.156 337.029 174.551C335.33 173.156 333.548 171.871 331.688 170.7C333.37 169.241 335.153 167.877 337.014 166.624C338.89 167.874 340.672 169.238 342.355 170.7Z" fill="#0555BF" /></g><g class="intro-piece"><path d="M347.036 175.289C345.207 176.412 343.457 177.631 341.789 178.963C340.296 177.39 338.71 175.931 337.023 174.552C338.707 173.156 340.489 171.871 342.349 170.7C344.001 172.127 345.574 173.669 347.033 175.289H347.036Z" fill="#0C6FF1" /></g><g class="intro-piece"><path d="M351.053 180.295C349.287 181.387 347.588 182.589 345.968 183.89C344.667 182.156 343.287 180.52 341.797 178.963C343.465 177.631 345.215 176.412 347.044 175.289C348.487 176.877 349.819 178.545 351.056 180.295H351.053Z" fill="#3D8DF7" /></g><g class="intro-piece"><path d="M337.028 174.552C335.361 175.931 333.772 177.406 332.278 178.963C330.611 177.646 328.845 176.412 327.016 175.305C328.475 173.684 330.031 172.143 331.683 170.7C333.544 171.871 335.326 173.156 337.025 174.552H337.028Z" fill="#0C6FF1" /></g><g class="intro-piece"><path d="M341.296 188.062C339.786 189.587 338.359 191.207 337.042 192.922C335.726 191.223 334.299 189.6 332.773 188.077C334.09 186.378 335.517 184.755 337.027 183.217C338.552 184.742 339.979 186.362 341.296 188.062Z" fill="#79B3FF" /></g><g class="intro-piece"><path d="M332.264 178.962C330.789 180.519 329.391 182.171 328.109 183.89C326.489 182.605 324.786 181.402 323.023 180.311C324.258 178.561 325.59 176.877 327.017 175.304C328.846 176.412 330.596 177.646 332.264 178.962Z" fill="#3D8DF7" /></g></svg></div></div>
   <a class="skip-link" href="#content">К содержанию</a>
@@ -413,7 +425,7 @@
           <p class="sidebar-label" id="sidebar-label">Темы правил</p>
           <nav id="category-nav" class="category-nav" aria-label="Фильтр по теме"></nav>
           <nav id="advice-nav" class="advice-nav" aria-label="Ситуации" hidden></nav>
-          <div class="sidebar-note"><span class="note-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" focusable="false"><path d="M8.5 9C8.5 7.067 10.067 5.5 12 5.5S15.5 7.067 15.5 9C15.5 11.5 12 11.5 12 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="18.4" r="1" fill="currentColor"/></svg></span><h2>Лучше уточнить заранее</h2><p>Если сомневаетесь, обратитесь в администрацию «Каллисто» или HR.</p><a href="/advice/7/">Объяснительная в кабинете 202 <span aria-hidden="true">↗</span></a></div>
+          <div class="sidebar-note"><span class="note-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" focusable="false"><path d="M8.5 9C8.5 7.067 10.067 5.5 12 5.5S15.5 7.067 15.5 9C15.5 11.5 12 11.5 12 14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="18.4" r="1" fill="currentColor"/></svg></span><h2>Лучше уточнить заранее</h2><p>Если сомневаетесь, обратитесь в администрацию «Каллисто» или Управление HR.</p></div>
         </div>
       </aside>
 
@@ -442,36 +454,25 @@
     <section id="contacts" class="contacts-section page-width" aria-labelledby="contacts-heading">
       <div class="section-heading"><h2 id="contacts-heading">Контакты</h2></div>
       <div class="contacts-grid">
-        <article class="contact-card residence-card" data-residence="kallisto" style="--residence-order:0" aria-labelledby="contact-kallisto">
-          <div class="residence-heading"><h3 id="contact-kallisto">Каллисто</h3><span class="residence-badge" aria-hidden="true"><i></i><span data-residence-light>День</span></span></div>
-          <button type="button" class="residence-model" aria-label="Включить вечернюю подсветку: Каллисто" aria-pressed="false" title="Включить вечернюю подсветку">
-            <canvas class="residence-canvas" aria-hidden="true"></canvas>
-            <span class="residence-model-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18h6m-5 3h4M8.8 14.5a6 6 0 1 1 6.4 0L15 17H9z"/></svg><span data-residence-hint>Нажми — включить свет</span></span>
-          </button>
+        <article class="contact-card residence-card" data-residence="kallisto" aria-labelledby="contact-kallisto">
+          <div class="residence-heading"><span class="residence-contact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M6.5 15c0-2.2 5-2.2 5 0m2-5h4m-4 4h4"/></svg></span><div><p class="residence-contact-kicker">Администрация хостела</p><h3 id="contact-kallisto">Каллисто</h3></div></div>
           <address class="contact-links">
             <a href="tel:+79870604942" class="contact-phone" aria-label="Позвонить в Каллисто: +7 987 060-49-42"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m8 3 3 5-3 3a16 16 0 0 0 5 5l3-3 5 3v3a2 2 0 0 1-2 2C10 21 3 14 3 5a2 2 0 0 1 2-2z"/></svg><span>+7 987 060-49-42</span></a>
             <a href="mailto:kallisto@alabuga.ru"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/></svg><span>kallisto@alabuga.ru</span></a>
           </address>
         </article>
-        <article class="contact-card residence-card" data-residence="ganimed" style="--residence-order:1" aria-labelledby="contact-ganimed">
-          <div class="residence-heading"><h3 id="contact-ganimed">Ганимед</h3><span class="residence-badge" aria-hidden="true"><i></i><span data-residence-light>День</span></span></div>
-          <button type="button" class="residence-model" aria-label="Включить вечернюю подсветку: Ганимед" aria-pressed="false" title="Включить вечернюю подсветку">
-            <canvas class="residence-canvas" aria-hidden="true"></canvas>
-            <span class="residence-model-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18h6m-5 3h4M8.8 14.5a6 6 0 1 1 6.4 0L15 17H9z"/></svg><span data-residence-hint>Нажми — включить свет</span></span>
-          </button>
+        <article class="contact-card residence-card" data-residence="ganimed" aria-labelledby="contact-ganimed">
+          <div class="residence-heading"><span class="residence-contact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M6.5 15c0-2.2 5-2.2 5 0m2-5h4m-4 4h4"/></svg></span><div><p class="residence-contact-kicker">Администрация хостела</p><h3 id="contact-ganimed">Ганимед</h3></div></div>
           <address class="contact-links">
             <a href="tel:+79872705030" class="contact-phone" aria-label="Позвонить в Ганимед: +7 987 270-50-30"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m8 3 3 5-3 3a16 16 0 0 0 5 5l3-3 5 3v3a2 2 0 0 1-2 2C10 21 3 14 3 5a2 2 0 0 1 2-2z"/></svg><span>+7 987 270-50-30</span></a>
             <a href="mailto:ganimed@alabuga.ru"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/></svg><span>ganimed@alabuga.ru</span></a>
           </address>
         </article>
-        <article class="contact-card residence-card" data-residence="piramida" style="--residence-order:2" aria-labelledby="contact-piramida">
-          <div class="residence-heading"><h3 id="contact-piramida">Пирамида</h3><span class="residence-badge" aria-hidden="true"><i></i><span data-residence-light>День</span></span></div>
-          <button type="button" class="residence-model" aria-label="Включить вечернюю подсветку: Пирамида" aria-pressed="false" title="Включить вечернюю подсветку">
-            <canvas class="residence-canvas" aria-hidden="true"></canvas>
-            <span class="residence-model-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18h6m-5 3h4M8.8 14.5a6 6 0 1 1 6.4 0L15 17H9z"/></svg><span data-residence-hint>Нажми — включить свет</span></span>
-          </button>
+        <article class="contact-card residence-card" data-residence="piramida" aria-labelledby="contact-piramida">
+          <div class="residence-heading"><span class="residence-contact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M6.5 15c0-2.2 5-2.2 5 0m2-5h4m-4 4h4"/></svg></span><div><p class="residence-contact-kicker">Администрация хостела</p><h3 id="contact-piramida">Пирамида</h3></div></div>
           <address class="contact-links">
             <a href="tel:+79372986810" class="contact-phone" aria-label="Позвонить в Пирамиду: +7 937 298-68-10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m8 3 3 5-3 3a16 16 0 0 0 5 5l3-3 5 3v3a2 2 0 0 1-2 2C10 21 3 14 3 5a2 2 0 0 1 2-2z"/></svg><span>+7 937 298-68-10</span></a>
+            <a href="mailto:piramida@alabuga.ru"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/></svg><span>piramida@alabuga.ru</span></a>
           </address>
         </article>
       </div>
@@ -1040,12 +1041,12 @@ window.HOSTEL_DATA = {
     {
       "number": 3,
       "title": "Нашли в квартире никотиносодержащую продукцию?",
-      "text": "Зафиксируйте на фото или видео и сразу сообщите администрации или HR. Не скрывайте и не выбрасывайте её."
+      "text": "Зафиксируйте на фото или видео и сразу сообщите об этом в администрацию или Управление HR. Не скрывайте и не выбрасывайте её."
     },
     {
       "number": 4,
       "title": "Другой проживающий нарушает правила поведения?",
-      "text": "Не вступайте в конфликт. Если это безопасно, зафиксируйте происходящее и обратитесь в администрацию или HR."
+      "text": "Не вступайте в конфликт. Если это безопасно, зафиксируйте происходящее и обратитесь в администрацию или Управление HR."
     },
     {
       "number": 5,
@@ -1056,11 +1057,6 @@ window.HOSTEL_DATA = {
       "number": 6,
       "title": "Как не нарушить комендантский час?",
       "text": "Заранее планируйте возвращение и перемещения по хостелу. После установленного времени (23:00) не покидайте свою квартиру и не находитесь в гостях."
-    },
-    {
-      "number": 7,
-      "title": "Вас пригласили в кабинет 202 и попросили повторно написать объяснительную?",
-      "text": "В администрации при оформлении объяснительной фиксируется факт нарушения, а меру дисциплинарного порицания применяют сотрудники HR корпоративного развития.\n\nПовторное написание объяснительной в кабинете 202 по тому же случаю не увеличивает количество нарушений: в учёте по-прежнему остаётся одно нарушение."
     }
   ],
   "categories": [
@@ -1085,7 +1081,7 @@ window.HOSTEL_DATA = {
       "label": "Покой и личные границы"
     }
   ],
-  "mainAdvice": "Если сомневаетесь, можно ли что-то хранить или проносить в корпоративный хостел, сначала уточните у администрации «Каллисто» или HR. Лучше спросить заранее, чем разбираться с нарушением после."
+  "mainAdvice": "Если сомневаетесь, можно ли что-то хранить или проносить в корпоративный хостел, сначала обратитесь в администрацию «Каллисто» или Управление HR. Лучше спросить заранее, чем разбираться с нарушением после."
 };
 
 </script>
@@ -1283,7 +1279,7 @@ window.HOSTEL_DATA = {
   }
   function renderAdvice() {
     byId('faq-list').innerHTML = data.faq.map(q=>`<details class="faq" id="faq-${q.number}"${q.number===1?' open':''}><summary><span class="faq-number">${q.number}</span><h3>${escape(q.title)}</h3><span class="chevron" aria-hidden="true"></span></summary><div class="faq-text">${q.text.split('\n\n').map(p=>`<p>${escape(p)}</p>`).join('')}</div></details>`).join('');
-    const shortNames=['Задержка на работе','Хранение предметов','Никотин в квартире','Нарушение поведения','Посторонние в квартире','Комендантский час','Кабинет 202'];
+    const shortNames=['Задержка на работе','Хранение предметов','Никотин в квартире','Нарушение поведения','Посторонние в квартире','Комендантский час'];
     byId('advice-nav').innerHTML = data.faq.map((q,i)=>`<a href="${HostelRoutes.url("faq-"+q.number)}"><b>0${q.number}</b>${escape(shortNames[i])}</a>`).join('');
     byId('main-advice-text').textContent=data.mainAdvice;
   }
@@ -1444,7 +1440,7 @@ window.HOSTEL_DATA = {
  schedule();
 })();
 </script>
-<script src="/experience.js?v=20261016-clean-links-intro"></script>
-<script src="/residences.js?v=20261016-3"></script>
+<script src="/experience.js?v=20261110-feedback"></script>
+
 </body>
 </html>
