@@ -216,32 +216,8 @@
 .hero .eyebrow>span{animation:reminder-dot-pulse 5s ease-in-out infinite}
 }
 
-/* Interactive growth sculpture and light on the existing blue cards. */
+/* Light and motion on the blue cards. */
 @media screen{
- .hero-facts{max-width:550px;min-height:112px;gap:16px;align-items:center}
- .hero-facts>span{flex:none;white-space:nowrap}
- .growth-scene{position:relative;flex:1 1 240px;min-width:138px;max-width:260px;height:112px;margin-left:auto;padding:0 0 18px;border:0;border-radius:18px;background:transparent;color:var(--blue);font:inherit;cursor:pointer;touch-action:manipulation}
- .growth-art{display:block;width:100%;height:100%;overflow:visible;pointer-events:none}
- .growth-scene-caption{position:absolute;inset:auto 0 0;text-align:center;color:#657493;font-size:9px;font-weight:650;line-height:1.5;letter-spacing:.025em;transition:color .3s ease}
- .growth-scene-caption>span{display:inline-block;margin-left:3px;color:var(--blue);transition:transform .4s ease}
- .growth-scene:is(:hover,:focus-visible) .growth-scene-caption{color:var(--blue)}
- .growth-scene:is(:hover,:focus-visible) .growth-scene-caption>span{transform:translate(2px,-2px)}
- .growth-parallax{transform:translate(var(--scene-x,0px),var(--scene-y,0px));transition:transform .4s cubic-bezier(.22,1,.36,1)}
- .growth-cube{transform:translate(var(--cube-x),var(--cube-y));transition:transform 1.15s cubic-bezier(.22,1,.36,1)}
- .growth-trail{transition:opacity .7s ease}
- .growth-scene.is-assembled .growth-trail{opacity:.12}
-.growth-cube-1{--cube-x:50px;--cube-y:77px;--float-delay:0.0s}
-.growth-cube-2{--cube-x:82px;--cube-y:66px;--float-delay:-0.8s}
-.growth-cube-3{--cube-x:114px;--cube-y:55px;--float-delay:-1.6s}
-.growth-cube-4{--cube-x:146px;--cube-y:44px;--float-delay:-2.4000000000000004s}
-.growth-cube-5{--cube-x:178px;--cube-y:33px;--float-delay:-3.2s}
-.growth-cube-6{--cube-x:210px;--cube-y:22px;--float-delay:-4.0s}
-.growth-scene.is-assembled .growth-cube-1{--cube-x:140px;--cube-y:20px}
-.growth-scene.is-assembled .growth-cube-2{--cube-x:123px;--cube-y:29px}
-.growth-scene.is-assembled .growth-cube-3{--cube-x:106px;--cube-y:38px}
-.growth-scene.is-assembled .growth-cube-4{--cube-x:157px;--cube-y:29px}
-.growth-scene.is-assembled .growth-cube-5{--cube-x:174px;--cube-y:38px}
-.growth-scene.is-assembled .growth-cube-6{--cube-x:140px;--cube-y:72px}
  .hero-cards [data-card-motion]{isolation:isolate;transition:transform .3s ease,box-shadow .35s ease,background .2s ease}
  .hero-cards [data-card-motion]>:not(.brand-pattern){position:relative;z-index:2}
  .hero-cards [data-card-motion] .brand-pattern{z-index:0}
@@ -251,28 +227,20 @@
  .hero-cards [data-card-motion]:is(.is-pointed,:focus-within)::before,.hero-cards [data-card-motion]:is(.is-pointed,:focus-within)::after{opacity:1}
  .hero-cards [data-card-motion]:is(.is-pointed,:focus-within){box-shadow:0 18px 36px -18px #1245cf70,0 6px 18px -12px #1245cf50}
 }
-@keyframes growth-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @keyframes hero-diamond-drift{0%,100%{transform:translateY(0) rotate(45deg)}50%{transform:translateY(-5px) rotate(48deg)}}
 @media screen and (prefers-reduced-motion:no-preference){
- .growth-float{animation:growth-float 7.5s ease-in-out infinite;animation-delay:var(--float-delay,0s)}
  .hero-cards .brand-pattern i{animation:hero-diamond-drift 12s ease-in-out infinite}
  .hero-cards .brand-pattern i:nth-child(2){animation-delay:-4s}
  .hero-cards .brand-pattern i:nth-child(3){animation-delay:-8s}
- .hero-motion-paused .growth-float,.hero-motion-paused .brand-pattern i{animation-play-state:paused}
+ .hero-motion-paused .brand-pattern i{animation-play-state:paused}
 }
 @media screen and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
  .hero-cards [data-card-motion]{transform:perspective(900px) rotateX(var(--card-rx,0deg)) rotateY(var(--card-ry,0deg)) translateY(var(--card-lift,0px))}
  .hero-cards [data-card-motion].is-pointed{--card-lift:-3px}
 }
-@media screen and (max-width:560px){
- .hero-facts{min-height:100px;gap:8px}
- .growth-scene{height:100px;max-width:190px;min-width:138px}
- .growth-scene-caption{font-size:9px}
-}
 @media(prefers-reduced-motion:reduce){
- .growth-cube,.growth-parallax,.growth-trail,.growth-scene-caption,.growth-scene-caption>span,.hero-cards [data-card-motion],.hero-cards [data-card-motion]::before,.hero-cards [data-card-motion]::after{transition:none!important}
+ .hero-cards [data-card-motion],.hero-cards [data-card-motion]::before,.hero-cards [data-card-motion]::after{transition:none!important}
 }
-@media print{.growth-scene{display:none!important}}
 /* Quiet depth and motion for the rule cards. Content keeps its natural height. */
 @media screen{
  .rule,.shared-group{box-shadow:0 3px 10px -8px #203d7830}
@@ -372,7 +340,7 @@
         <p class="eyebrow"><span></span> Памятка для проживающих</p>
         <h1 id="page-title">Правила проживания<br><span>в корпоративном хостеле</span></h1>
         <p class="hero-description">Всё, что нужно знать о порядке, безопасности<br class="desktop-break"> и уважении к соседям.</p>
-        <div class="hero-facts"><span><b>27</b> правил</span><button class="growth-scene" id="growth-scene" type="button" aria-label="Собрать фирменную синергию" aria-pressed="false" title="Нажмите, чтобы собрать синергию"><svg class="growth-art" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 112" width="280" height="112" aria-hidden="true" focusable="false"><defs><linearGradient id="synergy-glass" x1="0" y1="0" x2=".4" y2="1"><stop stop-color="#69CFF7"/><stop offset=".38" stop-color="#0C6FF1"/><stop offset="1" stop-color="#000D3C"/></linearGradient><radialGradient id="synergy-ground"><stop stop-color="#0C6FF1" stop-opacity=".18"/><stop offset="1" stop-color="#DEEEFD" stop-opacity="0"/></radialGradient></defs><ellipse cx="140" cy="94" rx="115" ry="17" fill="url(#synergy-ground)"/><g class="growth-parallax"><g class="growth-cube growth-cube-1"><g class="growth-float"><path d="M0.7 19.45 29.35 0.5Q30 -.1 30.65 .5L59.3 19.45Q60.35 20.3 58.9 20.3H1.1Q-.35 20.3 .7 19.45Z" transform="translate(0 5)" fill="#000D3C" opacity=".45"/><path d="M0.7 19.45 29.35 0.5Q30 -.1 30.65 .5L59.3 19.45Q60.35 20.3 58.9 20.3H1.1Q-.35 20.3 .7 19.45Z" fill="url(#synergy-glass)" stroke="#69CFF7" stroke-width=".6"/><path d="M4 18.1 29.9 1.2 55.8 18.1" fill="none" stroke="#DEEEFD" stroke-opacity=".55" stroke-width=".65" stroke-linejoin="round"/></g></g><g class="growth-cube growth-cube-2"><g class="growth-float"><path d="M0.7 19.45 29.35 0.5Q30 -.1 30.65 .5L59.3 19.45Q60.35 20.3 58.9 20.3H1.1Q-.35 20.3 .7 19.45Z" transform="translate(0 5)" fill="#000D3C" opacity=".45"/><path d="M0.7 19.45 29.35 0.5Q30 -.1 30.65 .5L59.3 19.45Q60.35 20.3 58.9 20.3H1.1Q-.35 20.3 .7 19.45Z" fill="url(#synergy-glass)" stroke="#69CFF7" stroke-width=".6"/><path d="M4 18.1 29.9 1.2 55.8 18.1" fill="none" stroke="#DEEEFD" stroke-opacity=".55" stroke-width=".65" stroke-linejoin="round"/></g></g><g class="growth-cube growth-cube-3"><g class="growth-float"><path d="M0.7 19.45 29.35 0.5Q30 -.1 30.65 .5L59.3 19.45Q60.35 20.3 58.9 20.3H1.1Q-.35 20.3 .7 19.45Z" transform="translate(0 5)" fill="#000D3C" opacity=".45"/><path d="M0.7 19.45 29.35 0.5Q30 -.1 30.65 .5L59.3 19.45Q60.35 20.3 58.9 20.3H1.1Q-.35 20.3 .7 19.45Z" fill="url(#synergy-glass)" stroke="#69CFF7" stroke-width=".6"/><path d="M4 18.1 29.9 1.2 55.8 18.1" fill="none" stroke="#DEEEFD" stroke-opacity=".55" stroke-width=".65" stroke-linejoin="round"/></g></g><g class="growth-cube growth-cube-4"><g class="growth-float"><path d="M0.7 19.45 29.35 0.5Q30 -.1 30.65 .5L59.3 19.45Q60.35 20.3 58.9 20.3H1.1Q-.35 20.3 .7 19.45Z" transform="translate(0 5)" fill="#000D3C" opacity=".45"/><path d="M0.7 19.45 29.35 0.5Q30 -.1 30.65 .5L59.3 19.45Q60.35 20.3 58.9 20.3H1.1Q-.35 20.3 .7 19.45Z" fill="url(#synergy-glass)" stroke="#69CFF7" stroke-width=".6"/><path d="M4 18.1 29.9 1.2 55.8 18.1" fill="none" stroke="#DEEEFD" stroke-opacity=".55" stroke-width=".65" stroke-linejoin="round"/></g></g></g></svg><span class="growth-scene-caption">Собрать синергию <span aria-hidden="true">↗</span></span></button></div>
+        <div class="hero-facts"><span><b>27</b> правил</span></div>
       </div>
       <div class="hero-cards">
       <aside class="curfew" data-card-motion aria-label="Напоминание о комендантском часе">
@@ -1377,28 +1345,11 @@ window.HOSTEL_DATA = {
 <script>
 /* Local decorative interactions; all navigation and rule data stay independent. */
 (()=>{
- const scene=document.getElementById('growth-scene');
  const hero=document.querySelector('.hero');
  const cards=[...document.querySelectorAll('[data-card-motion]')];
  const reduced=window.matchMedia('(prefers-reduced-motion:reduce)');
  const fine=window.matchMedia('(hover:hover) and (pointer:fine)');
- if(!scene||!hero)return;
- let sceneFrame=0,scenePoint={x:0,y:0};
- function clearScene(){cancelAnimationFrame(sceneFrame);sceneFrame=0;scene.style.removeProperty('--scene-x');scene.style.removeProperty('--scene-y');}
- scene.addEventListener('pointermove',event=>{
-  if(reduced.matches||!fine.matches||event.pointerType==='touch')return;
-  const rect=scene.getBoundingClientRect();
-  scenePoint={x:Math.max(-1,Math.min(1,(event.clientX-rect.left)/rect.width*2-1))*7,y:Math.max(-1,Math.min(1,(event.clientY-rect.top)/rect.height*2-1))*4};
-  if(!sceneFrame)sceneFrame=requestAnimationFrame(()=>{scene.style.setProperty('--scene-x',scenePoint.x.toFixed(2)+'px');scene.style.setProperty('--scene-y',scenePoint.y.toFixed(2)+'px');sceneFrame=0;});
- });
- ['pointerleave','pointercancel'].forEach(event=>scene.addEventListener(event,clearScene));
- scene.addEventListener('click',()=>{
-  const assembled=scene.classList.toggle('is-assembled');
-  scene.setAttribute('aria-pressed',String(assembled));
-  scene.setAttribute('aria-label',assembled?'Разложить фирменные элементы':'Собрать фирменную синергию');
-  scene.title=assembled?'Нажмите, чтобы разложить элементы':'Нажмите, чтобы собрать синергию';
-  scene.querySelector('.growth-scene-caption').innerHTML=assembled?'Разложить элементы <span aria-hidden="true">↗</span>':'Собрать синергию <span aria-hidden="true">↗</span>';
- });
+ if(!hero)return;
  const resets=[];
  cards.forEach(card=>{
   let frame=0,point={x:.5,y:.5};
@@ -1421,7 +1372,7 @@ window.HOSTEL_DATA = {
   ['pointerleave','pointercancel'].forEach(event=>card.addEventListener(event,reset));
   resets.push(reset);
  });
- function resetAll(){clearScene();resets.forEach(reset=>reset());}
+ function resetAll(){resets.forEach(reset=>reset());}
  reduced.addEventListener('change',resetAll);fine.addEventListener('change',resetAll);window.addEventListener('blur',resetAll);
  if('IntersectionObserver' in window){
   const visibility=new IntersectionObserver(entries=>{hero.classList.toggle('hero-motion-paused',!entries[0].isIntersecting);},{rootMargin:'100px'});
