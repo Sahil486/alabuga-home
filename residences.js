@@ -20,8 +20,8 @@
   const faces=[
    surface(quad(a,e,z,b,e,z,b,e,t,a,e,t),P(0,1,0),front,options.front||[],options.kind),
    surface(quad(b,e,z,b,c,z,b,c,t,b,e,t),P(1,0,0),side,options.right||[],options.kind),
-   surface(quad(b,c,z,a,c,z,a,c,t,b,c,t),P(0,-1,0),side,[],options.kind),
-   surface(quad(a,c,z,a,e,z,a,e,t,a,c,t),P(-1,0,0),front,[],options.kind)
+   surface(quad(b,c,z,a,c,z,a,c,t,b,c,t),P(0,-1,0),paints.back||side,options.back||[],options.kind),
+   surface(quad(a,c,z,a,e,z,a,e,t,a,c,t),P(-1,0,0),paints.left||front,options.left||[],options.kind)
   ];
   if(options.top!==false)faces.push(surface(quad(a,c,t,b,c,t,b,e,t,a,e,t),P(0,0,1),paints.roof||'#e2eaf1',options.roof||[],options.kind));
   out.push(...faces);return{a,b,c,e,t};
@@ -74,7 +74,7 @@
   for(const [p,q,n] of [[P(x-s,y-s,z),P(x+s,y-s,z),P(0,-1,.35)],[P(x+s,y-s,z),P(x+s,y+s,z),P(1,0,.35)],[P(x+s,y+s,z),P(x-s,y+s,z),P(0,1,.35)],[P(x-s,y+s,z),P(x-s,y-s,z),P(-1,0,.35)]])out.push(surface([p,q,tip],n,'#5d9894',[],'landscape'));
  }
  function grounds(out,pyramid){
-  const w=pyramid?250:196,d=pyramid?132:118;
+  const w=pyramid?356:216,d=pyramid?162:118;
   const roof=[topPatch(0,d/2-21,4.06,w-16,17,'#d7e1ed'),topPatch(0,d/2-21,4.08,w-16,1.1,'#b1c5df'),topPatch(0,-d/2+6,4.08,w-15,1,'#c8d8eb')];
   box(out,0,0,0,w,d,4,{front:'#cad8e8',side:'#9eafc6',roof:'#edf3fa'},{roof,kind:'platform'});
   box(out,0,d/2-.1,3.1,w-1,.5,.55,{wall:'#5b91dd',roof:'#86baf3'},{kind:'platform'});
@@ -88,70 +88,93 @@
  }
  function dorm(){
   const out=[];grounds(out,false);
-  const width=140,depth=54,floor=15.5,base=4;
+  const w=171,d=53,h=14.7,base=4,top=base+5*h;
+  const cream='#e8dcc0',brown='#634c43',trim='#59483f',white='#f5eee0',glass='#496377';
+  const cores=[-52,31];
   for(let row=0;row<5;row++){
-   const z=base+row*floor,front=[],right=[];
-   for(let col=0;col<10;col++){
-    const x=-width/2+10+col*(width-20)/9;
-    if(row===0&&Math.abs(x)<13)continue;
-    front.push(frontPatch(x,depth/2+.05,z+4,7.3,8,'#456282','window',row*19+col));
-    front.push(frontPatch(x+.1,depth/2+.08,z+4,0.45,8,'#bdcddd','mullion'));
-    front.push(frontPatch(x,depth/2+.08,z+3.2,8.7,.7,'#c5cfdb'));
+   const z=base+row*h,front=[],back=[],right=[],left=[];
+   for(const [sign,face] of [[1,front],[-1,back]]){
+    const y=sign*(d/2+.05);
+    if(row)face.push(frontPatch(0,y,z+.2,w,4.2,brown));
+    for(let col=0;col<13;col++){
+     const x=-76+col*12.65;
+     if(cores.some(core=>Math.abs(x-core)<7))continue;
+     face.push(frontPatch(x,y+sign*.02,z+5,8.9,7.5,white));
+     face.push(frontPatch(x,y+sign*.04,z+5.6,7.6,6.35,glass,'window',row*43+col+(sign<0?180:0)));
+     face.push(frontPatch(x,y+sign*.06,z+5.6,.65,6.35,white,'mullion'));
+     if(row>=3&&sign>0&&col%4===1)airConditioner(out,x+3.7,d/2+1.2,z+4.4,false,.62,row+1);
+    }
    }
-   for(let col=0;col<3;col++){
-    const y=-depth/2+10+col*17;
-    right.push(sidePatch(width/2+.06,y,z+4,6.5,8,'#425d7c','window',row*13+col+90));
-    right.push(sidePatch(width/2+.09,y+.1,z+4,.4,8,'#b2c4d6','mullion'));
+   for(const [sign,face] of [[1,right],[-1,left]]){
+    const x=sign*(w/2+.05);
+    for(const y of [-4,5]){
+     face.push(sidePatch(x,y,z+5,5.2,7.3,white));
+     face.push(sidePatch(x+sign*.02,y,z+5.6,4,6,glass,'window',row*7+y+80));
+    }
    }
-   front.push(frontPatch(0,depth/2+.1,z+.45,width,1.2,'#c7d5e5'));
-   right.push(sidePatch(width/2+.1,0,z+.45,depth,1.2,'#b9c9df'));
-   box(out,0,0,z,width,depth,floor,{front:row%2?'#edf0ef':'#e6eaf0',side:'#d2dce7',roof:'#dbe5ee'},{front,right,top:row===4});
-   if(row>=3){
-    for(const col of[0,3,6,9])airConditioner(out,-width/2+10+col*(width-20)/9,depth/2+1.2,z+.8,false,1,row+1);
-    for(const wy of[-17,17])airConditioner(out,width/2+1.2,wy,z+.8,true,1,row+1);
-   }
+   box(out,0,0,z,w,d,h,{front:row?cream:brown,side:row?cream:brown,back:row?cream:brown,left:row?cream:brown,roof:'#aaa298'},{front,back,right,left,top:row===4});
   }
-  // An enclosed entrance, roof parapet and rooftop service blocks.
-  const top=base+floor*5;
-  box(out,0,0,top,143,57,2.7,{wall:'#aabbd0',roof:'#e2ecf7'});
-  box(out,0,0,top+2.7,135,49,.8,{wall:'#718aa7',roof:'#91a6bf'});
-  for(const x of[-44,20,43])box(out,x,-10,top+3.5,8,8,4,{wall:'#b9c9d9',roof:'#e2eaf2'});
-  box(out,0,depth/2+3,base,18,7,13,{wall:'#275b91',roof:'#487bb1'},{front:[frontPatch(-3.6,depth/2+6.55,base+.5,5.8,10.5,'#618daf','door'),frontPatch(3.6,depth/2+6.55,base+.5,5.8,10.5,'#618daf','door')]});
-  box(out,0,depth/2+5,base+13,23,12,1.8,{wall:'#3c7cca',roof:'#84b9ef'});
-  box(out,0,depth/2+8,base,25,12,1.2,{wall:'#b5c7dc',roof:'#d7e4f1'},{kind:'landscape'});
-  box(out,0,depth/2+10,base,29,13,.6,{wall:'#acbfd5',roof:'#dce7f3'},{kind:'landscape'});
-  return{faces:out,yaw:.57,platformWidth:196,pyramid:false};
+  // Stairwell strips extend above the roofline, as on the reference facades.
+  for(const x of cores){
+   const y=d/2+1.5,front=[];
+   for(let row=0;row<5;row++){
+    const z=base+row*h;
+    front.push(frontPatch(x,y+1.55,z+4,4.5,9.5,white),frontPatch(x,y+1.58,z+4.6,3.25,8.3,glass,'window',row*23+x));
+   }
+   box(out,x,y,base,12,3,top-base+5,{wall:brown,roof:trim},{front});
+   box(out,x,d/2+4,base,14,7,7,{wall:trim,roof:'#837568'},{front:[frontPatch(x,d/2+7.55,base+.4,6.5,5.7,'#647987','door')]});
+  }
+  box(out,0,0,top,173,54.5,1.65,{wall:trim,roof:'#aaa49c'});
+  for(const sign of [-1,1]){
+   box(out,0,sign*26.4,top+3.2,170,.48,.42,{wall:'#696b68',roof:'#9b9a92'});
+   box(out,sign*84.5,0,top+3.2,.48,52,.42,{wall:'#696b68',roof:'#9b9a92'});
+   for(const x of [-84,-63,-42,-21,0,21,42,63,84])box(out,x,sign*26.4,top+1.65,.46,.46,1.8,{wall:'#747773'});
+  }
+  for(const x of [-29,49])box(out,x,-8,top+1.65,7,6,2.8,{wall:'#796d61',roof:'#bab3a6'});
+  return{faces:out,yaw:.55,platformWidth:216,pyramid:false};
  }
  function pyramid(){
   const out=[];grounds(out,true);
-  const base=4,floor=6.5,depth=78;
-  for(let row=0;row<18;row++){
-   const width=210-row*(8.85+34/17),d=depth-row*3.05,x=-7+row*.28,y=-9-row*.12,z=base+row*floor,front=[],right=[];
-   const count=Math.max(3,Math.floor((width-7)/8.7));
-   for(let col=0;col<count;col++){
-    const wx=x-width/2+6+col*(width-12)/(count-1);
-    front.push(frontPatch(wx,y+d/2+.05,z+1.15,3.3,2.9,'#344b63','window',row*17+col));
+  const base=4,h=6.15,d=60,levels=18,top=base+levels*h;
+  const cream='#d8c6a8',brown='#80675b',dark='#64544f',window='#52616a',blue='#4a718e',roof='#c7bdab';
+  for(let row=0;row<levels;row++){
+   const w=324-Math.min(row,16)*15.55,x=-2+Math.min(row,16)*.18,z=base+row*h;
+   const front=[],back=[],right=[],left=[];
+   const n=Math.max(6,Math.floor((w-9)/7.35)),band=row===8;
+   for(const [sign,face] of [[1,front],[-1,back]]){
+    const y=sign*(d/2+.06);
+    if(band)face.push(frontPatch(x,y,z+1,w-2,4.6,blue,'glass',81));
+    for(let i=0;i<n;i++){
+     const wx=x-w/2+4.5+i*(w-9)/(n-1);
+     if(band)face.push(frontPatch(wx,y+sign*.03,z+1,.22,4.6,'#9bacb2','mullion'));
+     else face.push(frontPatch(wx,y,z+1.42,2.75,3.05,window,'window',row*61+i+(sign<0?1100:0)));
+    }
+    // Tall dark vertical cores break up the long light facade.
+    for(const wx of [-23,24]){
+     const y2=y+sign*.065;
+     face.push(frontPatch(wx,y2,z,2.7,h,row<2?dark:brown));
+     face.push(frontPatch(wx,y2+sign*.03,z+1.25,.65,3.65,'#91a4ab','window',row*37+wx));
+    }
    }
-   const sideCount=Math.max(2,Math.floor((d-5)/9));
-   for(let col=0;col<sideCount;col++){
-    const wy=y-d/2+5+col*(d-10)/(sideCount-1);
-    right.push(sidePatch(x+width/2+.06,wy,z+1.15,3.1,2.9,'#34475f','window',row*13+col+210));
-   }
-   if(row===8||row===9){front.length=0;front.push(frontPatch(x,y+d/2+.08,z+.55,width-1,4.2,'#55758c','glass',row));for(let j=0;j<count;j++)front.push(frontPatch(x-width/2+5+j*(width-10)/(count-1),y+d/2+.1,z+.55,.35,4.2,'#a7b8c5','mullion'));}
-   front.push(frontPatch(x,y+d/2+.1,z+floor-.5,width,.45,'#e6e0d2'));
-   const dark=[0,6,12,17].includes(row);
-   box(out,x,y,z,width,d,floor,{front:dark?'#7b7773':'#c9c6b9',side:dark?'#6b6c6c':'#b4b5ae',roof:'#e5e0d3'},{front,right});
-   if(row>=12){
-    for(const col of[0,count-1])airConditioner(out,x-width/2+6+col*(width-12)/(count-1),y+d/2+.62,z+.1,false,.46,row+1);
-    airConditioner(out,x+width/2+.62,y,z+.1,true,.46,row+1);
-   }
-   // Thin terrace lips preserve the characteristic stepped silhouette.
-   if(row<17&&row%2===0)box(out,x-width/2+.45,y,z+floor,1,Math.max(12,d-4),1.4,{wall:'#bdc3c5',roof:'#e2e6e3'});
+   for(const [sign,face] of [[1,right],[-1,left]])for(let i=0;i<7;i++)
+    face.push(sidePatch(x+sign*(w/2+.06),-24+i*8,z+1.4,2.8,3.05,window,'window',row*17+i+(sign<0?1500:800)));
+   box(out,x,0,z,w,d,h,{front:row<2?brown:cream,back:row<2?brown:cream,side:row<2?dark:'#c4b496',left:row<2?dark:'#c4b496',roof},{front,back,right,left});
+   if(row>=12&&row<16)for(const wx of [x-w/2+5,x+w/2-5])
+    airConditioner(out,wx,d/2+.66,z+.28,false,.44,row+1);
   }
-  const top=base+18*floor;
-  box(out,-2.24,-11.04,top,24,25,2.4,{wall:'#3b4658',roof:'#6c819b'});
-  rooftopShuttle(out,-2.24,-11.04,top+2.4);
-  return{faces:out,yaw:.57,platformWidth:250,pyramid:true};
+  box(out,.88,0,top,76,60,3.2,{wall:dark,roof:'#b8aea1'});
+  rooftopShuttle(out,.88,1,top+3.2);
+  // The glazed volume projects from the opposite face; the main front stays clear.
+  const wingX=-8,wingY=-48,wingW=60,wingD=48,wingH=49,back=[],right=[],left=[];
+  for(let row=0;row<7;row++){
+   const z=base+3+row*5.9;
+   for(let col=0;col<8;col++)back.push(frontPatch(wingX-25+col*7.15,wingY-wingD/2-.06,z,6.6,5.4,'#354e62','window',1700+row*11+col));
+   for(const [sign,face] of [[1,right],[-1,left]])for(let col=0;col<6;col++)
+    face.push(sidePatch(wingX+sign*(wingW/2+.06),wingY-18+col*6.8,z+1.1,3.15,3.45,window,'window',1800+row*13+col+sign));
+  }
+  box(out,wingX,wingY,base,wingW,wingD,wingH,{wall:'#b9a68d',back:'#4c484a',roof:'#c8c0b3'},{back,right,left});
+  box(out,wingX,wingY,base+wingH,wingW+1,wingD+1,1.6,{wall:'#817267',roof:'#c9c0b1'});
+  return{faces:out,yaw:.31,platformWidth:356,pyramid:true};
  }
  function camera(yaw,pitch){
   const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
@@ -216,7 +239,7 @@
  function paintModel(ctx,model,view){
   const {width,height,yaw,pitch,night,dark,accent}=view;
   const cam=camera(yaw,pitch),dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
-  const baseCam=camera(model.yaw,.42);
+  const baseCam=camera(model.yaw+(view.rear?Math.PI:0),.42);
   const reference=model.faces.flatMap(face=>face.points.map(baseCam.project));
   const bounds=reference.reduce((b,p)=>[Math.min(b[0],p[0]),Math.min(b[1],p[1]),Math.max(b[2],p[0]),Math.max(b[3],p[1])],[Infinity,Infinity,-Infinity,-Infinity]);
   const scale=Math.min((width-26)/(bounds[2]-bounds[0]),(height-37)/(bounds[3]-bounds[1]));
@@ -267,6 +290,7 @@
   const button=card.querySelector('.residence-model'),canvas=card.querySelector('canvas'),ctx=canvas.getContext('2d');
   if(!ctx){button.hidden=true;continue;}
   const key=card.dataset.residence,model=key==='piramida'?pyramid():dorm();if(key==='ganimed')model.yaw=.7;
+  const viewButton=card.querySelector('[data-residence-view]');let rear=false;
   const accent=rgb(key==='ganimed'?'#36aee1':key==='piramida'?'#8680ef':'#448eef');
   let width=0,height=0,dpr=1,visible=false,frame=0,previous=0,px=0,py=0,tx=0,ty=0,night=0,targetNight=0,manual=null,themeDark=false,kick=0;
   function syncLabel(){
@@ -276,7 +300,7 @@
    card.querySelector('[data-residence-light]').textContent=on?'Вечер':'День';
    card.querySelector('[data-residence-hint]').textContent=on?'Нажми — выключить свет':'Нажми — включить свет';
   }
-  function draw(){if(!width||!height)return;ctx.setTransform(dpr,0,0,dpr,0,0);paintModel(ctx,model,{width,height,yaw:model.yaw+px*.13+kick*.035,pitch:.42+py*.055,night,dark:themeDark,accent,pointerX:px});}
+  function draw(){if(!width||!height)return;ctx.setTransform(dpr,0,0,dpr,0,0);paintModel(ctx,model,{width,height,yaw:model.yaw+(rear?Math.PI:0)+px*.13+kick*.035,rear,pitch:.42+py*.055,night,dark:themeDark,accent,pointerX:px});}
   function tick(now){
    frame=0;if(!visible||document.hidden)return;
    const dt=previous?Math.min(48,now-previous):16;previous=now;
@@ -295,6 +319,11 @@
   });
   button.addEventListener('pointerleave',()=>{tx=ty=0;card.style.removeProperty('--light-x');card.style.removeProperty('--light-y');request();});
   button.addEventListener('blur',()=>{tx=ty=0;request();});
+  viewButton?.addEventListener('click',()=>{
+   rear=!rear;px=tx=0;py=ty=0;
+   viewButton.textContent=rear?'Показать передний фасад':'Показать задний фасад';
+   draw();
+  });
   button.addEventListener('click',()=>{manual=targetNight?0:1;targetNight=manual;kick=reduced.matches?0:1;syncLabel();request();});
   if('ResizeObserver'in window)new ResizeObserver(resize).observe(button);else window.addEventListener('resize',resize,{passive:true});
   const scene={card,setTheme,request,setVisible(value){visible=value;if(value){card.classList.add('is-visible');request();}else if(frame){cancelAnimationFrame(frame);frame=0;}}};

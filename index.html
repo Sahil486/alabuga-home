@@ -334,6 +334,9 @@
 .residence-contact-kicker{margin:0 0 3px;font-size:11px;font-weight:700;color:var(--muted)}
 .residence-card[data-residence=piramida] .residence-model{height:clamp(246px,21vw,282px)}
 .residence-card .contact-links{margin-top:auto}
+.residence-view{align-self:center;margin:-8px 0 14px;padding:7px 12px;border:1px solid var(--residence-line);border-radius:8px;color:var(--blue);background:transparent;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.residence-view:hover{background:color-mix(in srgb,var(--residence-accent) 10%,transparent)}
+@media print{.residence-view{display:none}}
 </style>
 </head>
 <body id="top">
@@ -478,6 +481,7 @@
             <canvas class="residence-canvas" aria-hidden="true"></canvas>
             <span class="residence-model-hint" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18h6m-5 3h4M8.8 14.5a6 6 0 1 1 6.4 0L15 17H9z"/></svg><span data-residence-hint>Нажми — включить свет</span></span>
           </button>
+          <button type="button" class="residence-view" data-residence-view>Показать задний фасад</button>
           <address class="contact-links">
             <a href="tel:+79372986810" class="contact-phone" aria-label="Позвонить в Пирамиду: +7 937 298-68-10"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m8 3 3 5-3 3a16 16 0 0 0 5 5l3-3 5 3v3a2 2 0 0 1-2 2C10 21 3 14 3 5a2 2 0 0 1 2-2z"/></svg><span>+7 937 298-68-10</span></a>
             <a href="mailto:piramida@alabuga.ru"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/></svg><span>piramida@alabuga.ru</span></a>
@@ -1450,6 +1454,6 @@ window.HOSTEL_DATA = {
 </script>
 <script src="/experience.js?v=20261110-feedback"></script>
 
-  <script src="/residences.js?v=20261110-pyramid-base"></script>
+  <script src="/residences.js?v=20261110-facades"></script>
 </body>
 </html>
