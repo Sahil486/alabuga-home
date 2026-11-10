@@ -112,20 +112,24 @@
   poly([[.76,.34],[.85,.31],[.82,.35],[.79,.37]],'#3f81a9');
   return out;
  }
- function dormEntrance(out,x,facadeY,base){
-  const y=facadeY+4.5,z=base+.24,front=[];
-  const fy=y+4.54;
-  front.push(frontPatch(x,fy,z,16.25,7.05,'#d2dcdd'));
-  for(const [dx,width] of [[-6.1,3.55],[-2.05,3.7],[2.05,3.7],[6.1,3.55]]){
+ const DORM_ENTRY_W=15.5,DORM_ENTRY_H=8.2;
+ function dormEntrance(out,x,y,base){
+  const a=x-DORM_ENTRY_W/2,b=x+DORM_ENTRY_W/2,inner=y-4,top=base+DORM_ENTRY_H,front=[];
+  front.push(frontPatch(x,inner,base+.24,14.8,7.52,'#becdd0'));
+  for(const [dx,w] of [[-5.7,2.6],[-1.99,3.6],[1.99,3.6],[5.7,2.6]]){
    const door=Math.abs(dx)<3;
-   front.push(frontPatch(x+dx,fy+.02,z+(door?.22:.75),width,5.5,door?'#719aaa':'#526f82','door'));
-   front.push(frontPatch(x+dx,fy+.04,z+4.94,width-.25,.27,'#b0d4de'));
-   if(door)front.push(frontPatch(x+dx*.24,fy+.05,z+2.45,.27,1.5,'#eef5f3'));
+   front.push(frontPatch(x+dx,inner+.01,base+(door?.43:.9),w,5.95,door?'#80aebe':'#5c8296','door'));
+   front.push(frontPatch(x+dx,inner+.02,base+5.35,w-.2,.29,'#c6e2ea'));
+   if(door)front.push(frontPatch(x+dx*.25,inner+.03,base+2.85,.28,1.55,'#eaf4f4'));
   }
-  front.push(frontPatch(x,fy+.03,z+6,15.5,.7,'#819eaa','door'));
-  box(out,x,y,base,17,9,7.8,{wall:'#a5b6ba',front:'#344950',roof:'#d8dfe0'},{front,kind:'entrance'});
-  box(out,x,y+.25,base+7.8,19,10,.7,{wall:'#c3cfd2',roof:'#e2e9e9'});
-  box(out,x,y+4.9,base,18.2,2.2,.3,{wall:'#8e999d',roof:'#c8d0d2'});
+  front.push(frontPatch(x,inner+.01,base+6.7,14.35,.77,'#819eaa','door'));
+  out.push(
+   surface(quad(a,inner,base,b,inner,base,b,inner,top,a,inner,top),P(0,1,0),'#465b66',front,'entrance'),
+   surface(quad(a,inner,base,a,y,base,a,y,top,a,inner,top),P(1,0,0),'#89969a'),
+   surface(quad(b,y,base,b,inner,base,b,inner,top,b,y,top),P(-1,0,0),'#747f82'),
+   surface(quad(a,inner,base+.02,b,inner,base+.02,b,y,base+.02,a,y,base+.02),P(0,0,1),'#a9b3b4'),
+   surface(quad(a,y,top,b,y,top,b,inner,top,a,inner,top),P(0,0,-1),'#828e91')
+  );
  }
  function dorm(key='kallisto'){
   const out=[];grounds(out,false);
@@ -137,14 +141,14 @@
    const lightFloor=row>=3;
    for(const [sign,face] of [[1,front],[-1,back]]){
     const y=sign*(d/2+.055);
-    face.push(frontPatch(0,y,z+.35,w-.3,.20,lightFloor?'#b7c3c5':'#292e2b'));
+    if(row||sign<0)face.push(frontPatch(0,y,z+.35,w-.3,.20,lightFloor?'#b7c3c5':'#292e2b'));
     for(let col=0;col<16;col++){
      const x=-81+col*10.75;
      if(sign===1&&(Math.abs(x-coreX)<10||(row===0&&entrances.some(e=>Math.abs(x-e)<12))))continue;
      face.push(frontPatch(x,y+sign*.02,z+3.2,8,7.65,frame));
      face.push(frontPatch(x,y+sign*.04,z+3.75,6.85,6.5,glass,'window',row*43+col+(sign<0?180:0)));
      face.push(frontPatch(x+.7,y+sign*.06,z+3.75,.50,6.5,frame,'mullion'));
-     if(lightFloor&&sign>0&&col%2===1)airConditioner(out,x+2.35,d/2+.87,z+1.2,false,.66,row+1);
+     if(lightFloor&&sign>0)airConditioner(out,x+2.35,d/2+.99,z+.78,false,.72,row+1);
     }
    }
    for(const [sign,face] of [[1,right],[-1,left]]){
@@ -156,21 +160,36 @@
      details.push(sidePatch(x+sign*.04,y+.65,z+3.75,.43,6.5,frame,'mullion'));
     }
    }
-   box(out,0,0,z,w,d,h,{front:lightFloor?light:lower,back:lightFloor?light:lower,side:kallisto?light:lightFloor?light:lower,left:lightFloor?light:lower,roof:'#a7aeb0'},{front,back,right,left,top:row===4});
+   const shell=[];
+   box(shell,0,0,z,w,d,h,{front:lightFloor?light:lower,back:lightFloor?light:lower,side:kallisto?light:lightFloor?light:lower,left:lightFloor?light:lower,roof:'#a7aeb0'},{front,back,right,left,top:row===4});
+   if(row===0){
+    shell.shift();
+    const y=d/2,hw=DORM_ENTRY_W/2;
+    const wall=(a,b,bottom,top,details=[])=>out.push(surface(quad(a,y,bottom,b,y,bottom,b,y,top,a,y,top),P(0,1,0),lower,details));
+    let leftEdge=-w/2;
+    for(const x of [...entrances].sort((a,b)=>a-b)){
+     wall(leftEdge,x-hw,z,z+h,front.filter(p=>p.points.every(v=>v[0]>=leftEdge&&v[0]<=x-hw)));
+     wall(x-hw,x+hw,z+DORM_ENTRY_H,z+h);
+     dormEntrance(out,x,y,z);
+     leftEdge=x+hw;
+    }
+    wall(leftEdge,w/2,z,z+h,front.filter(p=>p.points.every(v=>v[0]>=leftEdge)));
+   }
+   out.push(...shell);
   }
   if(kallisto)out.push(surface(quad(w/2+.045,d/2,base,w/2+.045,-d/2,base,w/2+.045,-d/2,top,w/2+.045,d/2,top),P(1,0,0),light,[...moonMural(w/2+.061,base,top-base),...endWindows]));
-  // Brick stair tower and recessed-looking entrance on the long facade.
+  // Keep the stair tower above the recessed opening.
   const x=coreX,y=d/2+1.9,front=[];
   for(let row=0;row<5;row++){
    const z=base+row*h;
    for(const dx of [-3.1,3.1]){
-    front.push(frontPatch(x+dx,y+2.36,z+1,3.7,11.3,frame));
-    front.push(frontPatch(x+dx,y+2.38,z+1.55,2.7,10.25,glass,'window',row*17+dx));
+    const bottom=row===0?DORM_ENTRY_H+.6:1;
+    front.push(frontPatch(x+dx,y+2.36,z+bottom,3.7,12.3-bottom,frame));
+    front.push(frontPatch(x+dx,y+2.38,z+bottom+.4,2.7,11.8-bottom,glass,'window',row*17+dx));
    }
   }
   const brick=kallisto?'#91694f':'#8a6756';
-  box(out,x,y,base,15,4.7,top-base+5.5,{wall:brick,side:'#795844',roof:'#8a827b'},{front});
-  for(const entryX of entrances)dormEntrance(out,entryX,d/2,base);
+  box(out,x,y,base+DORM_ENTRY_H,15,4.7,top-base+5.5-DORM_ENTRY_H,{wall:brick,side:'#795844',roof:'#8a827b'},{front});
   box(out,0,0,top,179,59,1.45,{wall:'#aab3b4',roof:'#a3aaad'});
   for(const sign of [-1,1]){
    box(out,0,sign*28.7,top+3.35,177,.45,.37,{wall:'#56616a',roof:'#7f8a90'});
