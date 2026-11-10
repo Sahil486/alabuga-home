@@ -150,13 +150,6 @@
   const top=base+18*floor;
   box(out,7,-11,top,40,49,4,{wall:'#3b4658',roof:'#6c819b'});
   rooftopShuttle(out,7,-11,top+4);
-  // The lower side wing seen beside the main stepped building.
-  for(let row=0;row<9;row++){
-   const z=base+row*5.4,front=[],right=[];
-   for(let c=0;c<3;c++)front.push(frontPatch(63+c*7,21.04,z+1.2,3.1,2.9,'#3f5268','window',row*12+c+410));
-   for(let c=0;c<4;c++)right.push(sidePatch(87.04,-16+c*10,z+1.2,3.1,2.9,'#3b4e64','window',row*11+c+510));
-   box(out,74,-2,z,26,46,5.4,{front:row===8?'#686c71':'#cbc7b8',side:'#b0b4b1',roof:'#dce0dc'},{front,right,top:row===8});
-  }
   box(out,35,31,base,20,12,13,{wall:'#406684',roof:'#7d9bb6'},{front:[frontPatch(31,37.05,base+.7,6,10,'#6491ad','door'),frontPatch(39,37.05,base+.7,6,10,'#6491ad','door')]});
   box(out,35,32,base+13,25,17,1.3,{wall:'#6c8aa4',roof:'#b6d1e2'});
   return{faces:out,yaw:.57,platformWidth:222,pyramid:true};
