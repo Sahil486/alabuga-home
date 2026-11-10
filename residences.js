@@ -74,7 +74,7 @@
   for(const [p,q,n] of [[P(x-s,y-s,z),P(x+s,y-s,z),P(0,-1,.35)],[P(x+s,y-s,z),P(x+s,y+s,z),P(1,0,.35)],[P(x+s,y+s,z),P(x-s,y+s,z),P(0,1,.35)],[P(x-s,y+s,z),P(x-s,y-s,z),P(-1,0,.35)]])out.push(surface([p,q,tip],n,'#5d9894',[],'landscape'));
  }
  function grounds(out,pyramid){
-  const w=pyramid?222:196,d=pyramid?132:118;
+  const w=pyramid?250:196,d=pyramid?132:118;
   const roof=[topPatch(0,d/2-21,4.06,w-16,17,'#d7e1ed'),topPatch(0,d/2-21,4.08,w-16,1.1,'#b1c5df'),topPatch(0,-d/2+6,4.08,w-15,1,'#c8d8eb')];
   box(out,0,0,0,w,d,4,{front:'#cad8e8',side:'#9eafc6',roof:'#edf3fa'},{roof,kind:'platform'});
   box(out,0,d/2-.1,3.1,w-1,.5,.55,{wall:'#5b91dd',roof:'#86baf3'},{kind:'platform'});
@@ -126,7 +126,7 @@
   const out=[];grounds(out,true);
   const base=4,floor=6.5,depth=78;
   for(let row=0;row<18;row++){
-   const width=176-row*8.85,d=depth-row*3.05,x=-7+row*.28,y=-9-row*.12,z=base+row*floor,front=[],right=[];
+   const width=210-row*(8.85+34/17),d=depth-row*3.05,x=-7+row*.28,y=-9-row*.12,z=base+row*floor,front=[],right=[];
    const count=Math.max(3,Math.floor((width-7)/8.7));
    for(let col=0;col<count;col++){
     const wx=x-width/2+6+col*(width-12)/(count-1);
@@ -151,9 +151,7 @@
   const top=base+18*floor;
   box(out,-2.24,-11.04,top,24,25,2.4,{wall:'#3b4658',roof:'#6c819b'});
   rooftopShuttle(out,-2.24,-11.04,top+2.4);
-  box(out,35,31,base,20,12,13,{wall:'#406684',roof:'#7d9bb6'},{front:[frontPatch(31,37.05,base+.7,6,10,'#6491ad','door'),frontPatch(39,37.05,base+.7,6,10,'#6491ad','door')]});
-  box(out,35,32,base+13,25,17,1.3,{wall:'#6c8aa4',roof:'#b6d1e2'});
-  return{faces:out,yaw:.57,platformWidth:222,pyramid:true};
+  return{faces:out,yaw:.57,platformWidth:250,pyramid:true};
  }
  function camera(yaw,pitch){
   const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
